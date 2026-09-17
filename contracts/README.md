@@ -1,66 +1,34 @@
-## Foundry
+# gap402 contracts
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Two small, immutable contracts. AI evaluation stays offchain; the contracts
+provide escrow integrity and durable receipts.
 
-Foundry consists of:
+| Contract | Role |
+| --- | --- |
+| `src/GapBounty.sol` | USDC escrow for evidence bounties: create, commit evidence hashes, verifier-only finalize with exact-sum payouts, deadline refund. Deploys its receipt registry in the constructor. |
+| `src/EvidenceReceiptRegistry.sol` | Anchors `receiptHash` values; only the bound `GapBounty` can write. |
+| `src/test/MockUSDC.sol` | Test-only ERC-20 stand-in (not deployed). |
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Toolchain
 
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
+Built with **Arc Foundry** (`arc-forge` / `arc-anvil` / `arc-cast`), the Arc
+distribution of Foundry. `lib/forge-std` is vendored so the tree builds
+reproducibly without a submodule fetch.
 
 ```shell
-$ forge build
+# run the suite against the Arc profile (chain id, USDC semantics)
+arc-forge test --network arc -vvv
+
+# local node emulating Arc, incl. the USDC ERC-20 interface at
+# 0x3600000000000000000000000000000000000000 (decimals() = 6)
+arc-anvil --network arc
 ```
 
-### Test
+## Invariants under test
 
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- escrow cannot be overdrawn; `sum(payouts) + refund == escrow` (fuzzed)
+- a bounty settles exactly once; settled/cancelled state is terminal
+- only the per-bounty verifier can finalize; only the requester can cancel
+- recipients must be sorted, non-zero, non-empty; payout overflow reverts
+- commitments are capped and rejected after deadline; duplicates rejected
+- receipt hashes anchor only through the bound bounty contract
