@@ -1,0 +1,42 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.24.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Arc Foundry
+        run: |
+          curl -sSfL https://github.com/arc-network/arc-foundry/releases/download/v0.8.0-1/arc-foundry-v0.8.0-1-x86_64-unknown-linux-gnu.tar.gz \
+            | tar -xz -C /tmp
+          mkdir -p "$HOME/.local/bin"
+          for b in arc-forge arc-cast arc-anvil; do
+            mv "/tmp/$b" "$HOME/.local/bin/$b" 2>/dev/null || cp "/tmp/$b" "$HOME/.local/bin/$b"
+            chmod +x "$HOME/.local/bin/$b"
+          done
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Contract tests
+        working-directory: contracts
+        run: arc-forge test --network arc -vv
