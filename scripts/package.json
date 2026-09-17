@@ -1,0 +1,27 @@
+{
+  "name": "@gap402/scripts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@gap402/api": "workspace:*",
+    "@gap402/config": "workspace:*",
+    "@gap402/evidence": "workspace:*",
+    "@gap402/example-autonomous-buyer": "workspace:*",
+    "@gap402/example-evidence-supplier": "workspace:*",
+    "@gap402/protocol": "workspace:*",
+    "@gap402/schemas": "workspace:*",
+    "@gap402/sdk": "workspace:*",
+    "viem": "^2.37.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
