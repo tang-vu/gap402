@@ -1,0 +1,26 @@
+node_modules/
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# env / secrets — NEVER commit
+.env
+.env.*
+!.env.example
+
+# data
+data/
+*.sqlite
+*.sqlite3
+*.db
+
+# foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# logs
+*.log
+.DS_Store

@@ -1,0 +1,12 @@
+node_modules
+dist
+.next
+out
+coverage
+pnpm-lock.yaml
+deployments
+*.md
+contracts/lib
+contracts/out
+contracts/cache
+data
