@@ -52,6 +52,12 @@ screen recording of the web UI against the same run.
 > "Coverage jumps 14% to 79%. The agent folds the new evidence into its
 > answer and continues — it bought the missing proof."
 
+**Optional +10s — unanswered bounties don't burn**
+
+> "And if no one can answer? The deadline passes, the gap expires, and the
+> requester reclaims the escrow onchain — watch the balance come back.
+> Markets that fail still fail closed."
+
 **Final card**
 
 > "The agent couldn't find the answer. So it created a market for one."
