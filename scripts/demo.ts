@@ -284,6 +284,34 @@ async function main() {
     `  answer: "${QUESTION}" — supported by ${receipt.acceptedEvidence.length} accepted sources`,
   );
 
+  step(8, "unanswered gap expires — escrow reclaimed onchain");
+  const requesterClient = new Gap402({
+    api,
+    requester: {
+      id: "demo-buyer",
+      kind: "service",
+      address: ADDR.requester,
+    },
+  });
+  const shortGap = await requesterClient.createGap({
+    question: "Did WidgetNet v2 ship in Laos?",
+    claim: "Acme shipped WidgetNet v2 in Laos before 2026-09-01",
+    budget: "0.01",
+    deadlineSeconds: 10,
+  });
+  const balBefore = await chain.usdcBalanceOf(ADDR.requester);
+  line(`  bounty funded: ${shortGap.gap.id} · 0.010000 USDC (10s deadline)`);
+  await sleep(11_000);
+  const expired = await client.getGap(shortGap.gap.id);
+  line(`  after deadline: status = ${expired.gap.status}`);
+  const cancel = await client.cancelGap(shortGap.gap.id);
+  const balAfter = await chain.usdcBalanceOf(ADDR.requester);
+  line(`  cancel tx: ${cancel.cancelTx ?? "offchain"}`);
+  line(
+    `  requester balance: ${formatUsdcAmount(balBefore)} -> ${formatUsdcAmount(balAfter)} USDC (refunded)`,
+  );
+  line(`  final status: ${cancel.gap.status} — terminal`);
+
   line("\n─────────────────────────────────────────────────────");
   line("  The agent couldn't find the answer.");
   line("  So it created a market for one.");
