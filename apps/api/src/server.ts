@@ -325,6 +325,43 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
     return receipt;
   });
 
+  app.post("/api/gaps/:id/cancel", async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const gap = service.getGap(id); // getGap lazily marks expired
+    if (!gap) return reply.code(404).send({ error: "not found" });
+    if (gap.status === "cancelled") {
+      return reply.code(409).send({ error: "already cancelled" });
+    }
+    if (gap.status !== "expired") {
+      return reply.code(409).send({
+        error: `gap is ${gap.status}; only expired gaps can be cancelled`,
+      });
+    }
+    // Onchain reclaim: only when the bounty was actually funded onchain.
+    let cancelTx: `0x${string}` | undefined;
+    const runtime = service.getRuntime(id);
+    if (bountyContract && runtime.chainBountyId !== undefined) {
+      if (!requesterKey) {
+        return reply
+          .code(400)
+          .send({ error: "requester key not configured on this server" });
+      }
+      cancelTx = await chain.cancel(
+        bountyContract,
+        requesterKey,
+        BigInt(runtime.chainBountyId),
+      );
+    }
+    const updated = service.setStatus(id, "cancelled");
+    return {
+      gap: updated,
+      cancelTx: cancelTx ?? null,
+      explorer: {
+        cancelTx: cancelTx ? explorerTxUrl(network.explorerUrl, cancelTx) : null,
+      },
+    };
+  });
+
   app.post("/api/gaps/:id/consume", async (req, reply) => {
     const { id } = req.params as { id: string };
     const gap = service.getGap(id);

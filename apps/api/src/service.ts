@@ -101,7 +101,19 @@ export class GapService {
   }
 
   getGap(id: string): GapRequest | null {
-    return this.store.get<GapRequest>("gap", id);
+    const gap = this.store.get<GapRequest>("gap", id);
+    // Lazily expire: a live gap whose deadline passed transitions to
+    // "expired" on read, so escrow can be reclaimed via cancel.
+    if (
+      gap &&
+      new Date() > new Date(gap.deadline) &&
+      ["detected", "funded", "open", "submissions", "verified"].includes(gap.status)
+    ) {
+      const next = { ...gap, status: "expired" as const };
+      this.store.put("gap", next);
+      return next;
+    }
+    return gap;
   }
 
   setStatus(id: string, status: GapRequest["status"]): GapRequest {
@@ -113,7 +125,7 @@ export class GapService {
   }
 
   listGaps(): GapRequest[] {
-    return this.store.list<GapRequest>("gap");
+    return this.store.list<GapRequest>("gap").map((g) => this.getGap(g.id) ?? g);
   }
 
   /* ── submissions ────────────────────────────────────────────────── */

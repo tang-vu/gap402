@@ -8,8 +8,8 @@ import type { BountyStatus } from "@gap402/schemas";
  *                       +-> expired -> cancelled
  */
 const TRANSITIONS: Record<BountyStatus, readonly BountyStatus[]> = {
-  detected: ["funded", "cancelled"],
-  funded: ["open", "cancelled"],
+  detected: ["funded", "expired", "cancelled"],
+  funded: ["open", "expired", "cancelled"],
   open: ["submissions", "verified", "expired", "cancelled"],
   submissions: ["verified", "expired", "cancelled"],
   verified: ["settled", "expired"],

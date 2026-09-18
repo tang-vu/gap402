@@ -127,6 +127,12 @@ bounty
   .argument("<gapId>")
   .action(async (gapId) => out(await client().finalizeGap(gapId)));
 
+bounty
+  .command("cancel")
+  .description("cancel an expired gap; reclaims escrow when funded onchain")
+  .argument("<gapId>")
+  .action(async (gapId) => out(await client().cancelGap(gapId)));
+
 const receipt = program.command("receipt").description("evidence receipts");
 
 receipt

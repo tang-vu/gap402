@@ -195,4 +195,43 @@ describe("gap lifecycle", () => {
     expect(sub.statusCode).toBe(500);
     expect(sub.json().error).toContain("deadline");
   });
+
+  it("expires a past-deadline gap on read and allows cancel", async () => {
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/gaps",
+      payload: {
+        question: "q",
+        claim: "c",
+        requirements: {},
+        budgetUnits: "1000",
+        requester: { address: REQUESTER },
+        deadline: new Date(Date.now() - 1000).toISOString(),
+      },
+    });
+    const { gap } = res.json();
+
+    const view = await app.inject({ method: "GET", url: `/api/gaps/${gap.id}` });
+    expect(view.json().gap.status).toBe("expired");
+
+    const fin = await app.inject({
+      method: "POST",
+      url: `/api/gaps/${gap.id}/finalize`,
+    });
+    expect(fin.statusCode).toBe(409);
+
+    const cancel = await app.inject({
+      method: "POST",
+      url: `/api/gaps/${gap.id}/cancel`,
+    });
+    expect(cancel.statusCode).toBe(200);
+    expect(cancel.json().gap.status).toBe("cancelled");
+    expect(cancel.json().cancelTx).toBeNull(); // offchain: no bounty onchain
+
+    const again = await app.inject({
+      method: "POST",
+      url: `/api/gaps/${gap.id}/cancel`,
+    });
+    expect(again.statusCode).toBe(409);
+  });
 });

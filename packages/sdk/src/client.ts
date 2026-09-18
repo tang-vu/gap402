@@ -126,6 +126,14 @@ export class Gap402 {
     return this.req("POST", `/api/gaps/${bountyId}/consume`);
   }
 
+  /** Cancel an expired gap; reclaims escrow onchain when it was funded. */
+  async cancelGap(bountyId: string): Promise<{
+    gap: GapRequest;
+    cancelTx: string | null;
+  }> {
+    return this.req("POST", `/api/gaps/${bountyId}/cancel`);
+  }
+
   async evaluateGap(bountyId: string): Promise<{ evaluations: EvidenceEvaluation[] }> {
     return this.req("POST", `/api/gaps/${bountyId}/evaluate`);
   }
