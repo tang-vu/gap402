@@ -346,7 +346,9 @@ contract GapBountyTest is Test {
         vm.assume(
             attacker != requester &&
                 attacker != verifier &&
-                attacker != address(0)
+                attacker != address(0) &&
+                attacker != address(gb) && // gb holds the escrow itself
+                attacker != address(usdc)
         );
         uint256 id = _create();
         address[] memory r = new address[](1);
