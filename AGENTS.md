@@ -10,6 +10,10 @@
   WSL shells use `"/mnt/d/Program Files/GitHub CLI/gh.exe"` and
   `"/mnt/d/Git/cmd/git.exe" -C "D:\Github\gap402"` — sandbox `gh` is a
   different account and cannot push.
+- If every `.exe` fails with `Exec format error`, that shell lacks Windows
+  interop: commit locally with `-c user.name=... -c user.email=...` and ask
+  the operator to run `git push` from a Windows terminal (Linux side has no
+  stored credentials; gh token lives in Windows Credential Manager).
 - Never commit `.env`, private keys, or `data/`.
 
 ## Verification
