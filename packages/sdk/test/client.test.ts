@@ -77,6 +77,43 @@ describe("Gap402 client", () => {
     expect(calls).toBe(2);
   });
 
+  it("cancelGap posts to the cancel endpoint", async () => {
+    let path = "";
+    let method = "";
+    const gap = new Gap402({
+      api: "http://x",
+      fetchImpl: stubFetch((url, init) => {
+        path = url;
+        method = init.method ?? "GET";
+        return {
+          status: 200,
+          body: { gap: { id: "g1", status: "cancelled" }, cancelTx: "0xabc" },
+        };
+      }),
+    });
+    const res = await gap.cancelGap("g1");
+    expect(method).toBe("POST");
+    expect(path).toBe("http://x/api/gaps/g1/cancel");
+    expect(res.gap.status).toBe("cancelled");
+    expect(res.cancelTx).toBe("0xabc");
+  });
+
+  it("waitForEvidence returns early on expired status", async () => {
+    const gap = new Gap402({
+      api: "http://x",
+      fetchImpl: stubFetch(() => ({
+        status: 200,
+        body: {
+          gap: { id: "g1", status: "expired" },
+          runtime: {},
+          submissionCount: 0,
+        },
+      })),
+    });
+    const view = await gap.waitForEvidence("g1", { intervalMs: 1, timeoutMs: 5000 });
+    expect(view.gap.status).toBe("expired");
+  });
+
   it("waitForEvidence times out on non-terminal status", async () => {
     const gap = new Gap402({
       api: "http://x",
