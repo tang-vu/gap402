@@ -111,8 +111,19 @@ export class Gap402 {
       /** Supplier private key; required when commitOnchain is true. */
       supplierKey?: `0x${string}` | undefined;
     },
-  ): Promise<{ submission: EvidenceSubmission }> {
+  ): Promise<{
+    submission: EvidenceSubmission;
+    /** True when the API deduplicated this URL/content-hash to a prior submission. */
+    duplicate: boolean;
+    /** Onchain commitment tx when commitOnchain was requested. */
+    commitTx: string | null;
+  }> {
     return this.req("POST", `/api/gaps/${bountyId}/submissions`, evidence);
+  }
+
+  /** Mark a settled gap consumed by the requester. */
+  async consumeGap(bountyId: string): Promise<{ gap: GapRequest }> {
+    return this.req("POST", `/api/gaps/${bountyId}/consume`);
   }
 
   async evaluateGap(bountyId: string): Promise<{ evaluations: EvidenceEvaluation[] }> {

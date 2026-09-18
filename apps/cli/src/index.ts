@@ -159,16 +159,25 @@ receipt
       acceptedEvidence: doc.acceptedEvidence.length,
       totalPaidUnits: doc.totalPaidUnits,
     };
-    // Cross-check the payout math inside the receipt.
-    const sum = doc.acceptedEvidence.reduce((s, e) => s + BigInt(e.payoutUnits), 0n);
-    checks.payoutSumConsistent = sum <= BigInt(doc.totalPaidUnits);
+    // Exact accounting: evidence payouts + verifier fee == totalPaid.
+    const evidenceSum = doc.acceptedEvidence.reduce(
+      (s, e) => s + BigInt(e.payoutUnits),
+      0n,
+    );
+    checks.evidencePaidUnits = evidenceSum.toString();
+    checks.accountingExact =
+      evidenceSum + BigInt(doc.verifierFeeUnits) === BigInt(doc.totalPaidUnits);
     if (o.registry) {
       const network = resolveNetwork();
       const chain = new Gap402Chain(network);
       checks.onchainAnchored = await chain.isReceiptAnchored(o.registry, doc.receiptHash);
     }
     out(checks);
-    if (!checks.hashMatch || checks.onchainAnchored === false) {
+    if (
+      !checks.hashMatch ||
+      checks.accountingExact === false ||
+      checks.onchainAnchored === false
+    ) {
       process.exit(1);
     }
   });

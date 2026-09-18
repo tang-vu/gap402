@@ -5,6 +5,7 @@ import { resolveNetwork, type NetworkConfig, explorerTxUrl } from "@gap402/confi
 import { Gap402Chain } from "@gap402/sdk";
 import { computeSpecHash } from "@gap402/protocol";
 import { bytes32Schema, evmAddressSchema } from "@gap402/schemas";
+import type { SemanticProvider } from "@gap402/verifier";
 import { DuplicateError, Store } from "./store.js";
 import { GapService } from "./service.js";
 
@@ -15,6 +16,8 @@ export interface ApiDeps {
   requesterKey?: `0x${string}`;
   verifierKey?: `0x${string}`;
   bountyContract?: `0x${string}`;
+  /** Semantic provider override; defaults to providerFromEnv(). */
+  semantic?: SemanticProvider;
 }
 
 export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> {
@@ -32,7 +35,7 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
   const bountyContract =
     deps.bountyContract ?? (process.env.GAP_BOUNTY_ADDRESS as `0x${string}` | undefined);
 
-  const service = new GapService(store, verifierAddress);
+  const service = new GapService(store, verifierAddress, deps.semantic);
   const chain = new Gap402Chain(network);
 
   const app = Fastify({ logger: false });

@@ -5,7 +5,7 @@ import { defineConfig } from "vitest/config";
 // native binding load can exceed the default timeouts — allow headroom.
 export default defineConfig({
   test: {
-    testTimeout: 30_000,
-    hookTimeout: 60_000,
+    testTimeout: 60_000,
+    hookTimeout: 180_000,
   },
 });
