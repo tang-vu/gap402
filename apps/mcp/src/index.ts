@@ -119,6 +119,16 @@ server.registerTool(
 );
 
 server.registerTool(
+  "gap402_cancel_gap",
+  {
+    description:
+      "Cancel an expired gap and reclaim its escrow. Only works after the deadline; funded gaps refund onchain.",
+    inputSchema: { id: z.string() },
+  },
+  async ({ id }) => text(await client.cancelGap(id)),
+);
+
+server.registerTool(
   "gap402_get_receipt",
   {
     description: "Fetch a cryptographic Evidence Receipt (by receipt id or gap id).",

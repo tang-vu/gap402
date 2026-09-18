@@ -48,6 +48,10 @@
    receipt with `settlementTx`.
 6. **Buyer** polls (`waitForEvidence`), fetches the receipt, merges accepted
    evidence, recomputes coverage, continues its answer.
+7. **Deadline reclaim**: reads past `deadline` mark the gap `expired`
+   (lazy, in `getGap`/`listGaps`). `POST /:id/cancel` then calls
+   `GapBounty.cancel` to refund escrow onchain — terminal and
+   settlement-exclusive, enforced both offchain and by the contract.
 
 ## Trust boundaries
 
