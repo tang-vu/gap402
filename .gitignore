@@ -5,7 +5,7 @@ out/
 coverage/
 *.tsbuildinfo
 
-# env / secrets — NEVER commit
+# env / secrets â€” NEVER commit
 .env
 .env.*
 !.env.example
@@ -24,3 +24,9 @@ contracts/broadcast/
 # logs
 *.log
 .DS_Store
+
+# AI assistant artifacts
+.devin/
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+NUL
