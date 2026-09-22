@@ -78,3 +78,22 @@ arc-forge verify-contract <address> src/GapBounty.sol:GapBounty \
 | mainnet | — | — | **not deployed** — requires funded key + explicit run |
 | testnet | — | — | not deployed |
 | local | per-run | per-run | `pnpm demo` deploys fresh each run |
+# Authenticated operator writes and public reviewer UI
+
+Configure a strong `GAP402_WRITE_TOKEN` on the API and operator CLI/MCP process
+before enabling testnet/mainnet writes. Pass `writeToken` explicitly to SDK
+instances. Do not expose it in `NEXT_PUBLIC_*` or browser code. Non-local writes
+without this configuration return 503; invalid authorization returns 401.
+Non-local bounty creation also requires both signers and the bounty contract.
+The requester address must match the funding signer. The public web UI needs
+only `GAP402_API`; its Evidence Lab uses an isolated simulation endpoint.
+
+Mainnet demo now also requires `GAP402_WRITE_TOKEN`; it forwards the credential
+to its local API for all operator actions. Mainnet remains opt-in and requires
+funded keys, a deployed contract, real source URLs and an appropriate verifier.
+Store secrets outside Git. Expose the UI over HTTPS, leave API writes private
+or authenticated, and apply edge rate limits to the public simulation endpoint.
+
+Export a settled proof with `gap402 proof-export <gap-id> > proof.json` and run
+`gap402 proof-verify proof.json` offline. Receipt pages offer browser verification
+and JSON download. Check the receipt registry separately for onchain anchoring.

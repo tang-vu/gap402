@@ -80,3 +80,27 @@ Also see the repository-level [SECURITY.md](../SECURITY.md) for reporting.
   checks but not by distributed locking.
 - Evidence content is fetched by suppliers, not crawled by the platform —
   a fabricated URL is only caught by verifier heuristics/semantics.
+# Product verification boundaries (September 2026)
+
+`/api/gaps/:id/proof` exports request + plan + receipt. `verifyBundle` verifies
+canonical commitments, exact bigint accounting, recipients and bounty binding.
+It does not fetch evidence or query a registry. Rehashing an entirely forged
+bundle can pass; compare with a trusted onchain anchor for authenticity.
+
+The verifier checks declared metadata and sanitized excerpts. `url_format` is
+syntax validation, not evidence of successful retrieval. Source ownership and
+editorial independence are not authenticated. `minIndependentSources` counts
+accepted root-domain heuristics before building a settlement plan. The existing
+last-two-label heuristic is not a full public-suffix or ownership analysis.
+
+Buyer budgets are reserved before asynchronous creation and retain reservations
+on ambiguous failures. The cap is per buyer instance, not persistent across
+restarts. Reconcile chain state before retrying. A refund is credited only after
+receipt integrity, request binding and exact budget checks pass.
+
+For testnet/mainnet API writes set a strong `GAP402_WRITE_TOKEN`; SDK clients
+receive it via `writeToken`, CLI/MCP via the environment. It is an operator
+credential, never a browser/public variable. Use TLS and restrict operator access.
+This is not multi-user wallet authorization. Read-only routes remain public.
+`POST /api/demo` is public but uses a fresh in-memory store, fixed fixtures and
+no chain client or signing keys. Rate-limit it at the hosting edge.

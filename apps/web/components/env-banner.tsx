@@ -8,17 +8,24 @@ export async function EnvBanner() {
   } catch {
     /* API down — banner still renders */
   }
-  const network = health?.network ?? "local";
+  const network = health?.network ?? "unknown";
   const label =
     network === "mainnet"
       ? "ARC MAINNET"
       : network === "testnet"
         ? "ARC TESTNET"
-        : "LOCAL";
+        : network === "local"
+          ? "LOCAL"
+          : "NETWORK UNKNOWN";
   return (
     <div className={`banner ${network}`}>
       <span className="dot" />
       <span>{label}</span>
+      {health ? (
+        <span>
+          {health.settlementMode} · verifier {health.verificationMode}
+        </span>
+      ) : null}
       {health?.chainId ? <span>chain {health.chainId}</span> : null}
       {health?.bountyContract ? (
         <span>

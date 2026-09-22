@@ -12,7 +12,7 @@ const TRANSITIONS: Record<BountyStatus, readonly BountyStatus[]> = {
   funded: ["open", "expired", "cancelled"],
   open: ["submissions", "verified", "expired", "cancelled"],
   submissions: ["verified", "expired", "cancelled"],
-  verified: ["settled", "expired"],
+  verified: ["submissions", "settled", "expired"],
   settled: ["consumed"],
   consumed: [],
   expired: ["cancelled"],

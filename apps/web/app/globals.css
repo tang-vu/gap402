@@ -12,6 +12,70 @@
   --mono: "SFMono-Regular", ui-monospace, "JetBrains Mono", Menlo, monospace;
 }
 
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+.lab-controls label,
+label[for="proof-json"] {
+  display: block;
+  margin: 14px 0 8px;
+  font-weight: 600;
+}
+.lab-controls select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 8px;
+  max-width: 100%;
+  margin: 0 12px 12px 0;
+}
+.notice {
+  color: var(--warn);
+}
+.proof-input {
+  display: block;
+  width: 100%;
+  min-height: 240px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  resize: vertical;
+}
+button {
+  cursor: pointer;
+  font: inherit;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.panel,
+dd {
+  overflow-wrap: anywhere;
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  header.site .row {
+    flex-wrap: wrap;
+  }
+  .banner {
+    flex-wrap: wrap;
+  }
+  .market {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

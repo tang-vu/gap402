@@ -1,6 +1,7 @@
 import { Gap402, type GapView } from "@gap402/sdk";
 import { parseUsdcAmount, formatUsdcAmount } from "@gap402/config";
 import type { EvidenceReceipt } from "@gap402/schemas";
+import { computeSpecHash, verifyReceipt } from "@gap402/protocol";
 
 /**
  * Reference autonomous buyer. Given an evidence-sensitive question it:
@@ -115,6 +116,13 @@ export class AutonomousBuyer {
     }
 
     const budget = input.budgetUnits ?? this.policy.maxBountyUnits;
+    if (budget <= 0n || budget > this.policy.autoPayBelowUnits) {
+      return {
+        funded: false,
+        reason: "budget outside automatic payment policy",
+        coverageBeforeBps: before.coverageBps,
+      };
+    }
     if (budget > this.policy.maxBountyUnits) {
       return {
         funded: false,
@@ -134,6 +142,9 @@ export class AutonomousBuyer {
       this.policy.minDeadlineSeconds,
     );
 
+    // Reserve before the first funding await: concurrent calls share the cap.
+    // Retain the reservation on ambiguous network errors; reconcile before retrying.
+    this.spent += budget;
     const view = await this.gap402.createGap({
       question: input.question,
       claim: input.claim,
@@ -142,13 +153,22 @@ export class AutonomousBuyer {
       deadlineSeconds,
       requirements: input.requirements ?? {},
     });
-    this.spent += budget; // reserved at creation; refunded residue comes back
 
     const settled: GapView = await this.gap402.waitForEvidence(view.gap.id, {
       timeoutMs: this.policy.waitTimeoutMs,
     });
     const receipt = (await this.gap402.getReceiptByBounty(view.gap.id)) ?? undefined;
     if (receipt) {
+      if (
+        !verifyReceipt(receipt).valid ||
+        receipt.bountyId !== view.gap.id ||
+        receipt.requestHash !== computeSpecHash(view.gap) ||
+        BigInt(receipt.totalPaidUnits) + BigInt(receipt.refundUnits) !== budget
+      ) {
+        throw new Error(
+          "receipt integrity or bounty binding failed; budget remains reserved",
+        );
+      }
       const refund = BigInt(receipt.refundUnits);
       this.spent -= refund; // unspent residue returns to budget
     }
@@ -158,7 +178,7 @@ export class AutonomousBuyer {
       ...(receipt?.acceptedEvidence ?? []).map((e) => ({
         url: e.url,
         supports: true,
-        independent: true,
+        independent: e.scores.independence >= 800_000,
       })),
     ];
     const after = await this.coverage({

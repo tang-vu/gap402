@@ -26,6 +26,9 @@ export default async function Home() {
           deterministic settlement, and a cryptographic receipt anyone can verify.
         </p>
         <div className="cta-row">
+          <Link className="btn primary" href="/lab">
+            Try the evidence lab
+          </Link>
           <Link className="btn primary" href="/gaps">
             View open gaps
           </Link>

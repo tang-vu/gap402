@@ -4,6 +4,29 @@
 **One-liner:** Gap402 turns unresolved AI knowledge gaps into USDC-funded
 evidence markets on Arc.
 
+## Eligibility checked September 22, 2026
+
+[Current Arc Microgrants rules](https://community.arc.io/public/events/arc-microgrants-f8tijfjhyq)
+require a working mainnet deployment and an openable link, public repository,
+short Arc-use description, and builder profile. Deadline: October 14, 2026,
+23:59 ET; reviews are rolling. This document is **draft submission copy**,
+not a claim that a local/testnet demo is eligible. Mainnet deployment, a public
+URL, and a real settlement proof remain required. Confirm that this work has
+not already received Circle/Arc funding before submission.
+
+## Reviewable product improvements
+
+- `/lab`: three isolated, zero-spend scenarios using the production domain engine;
+  synthetic sources and mock semantic scoring are prominently identified.
+- Receipt pages export the original request, settlement plan and receipt.
+  `/verify` checks the bundle locally in the browser; CLI and MCP provide the
+  same integration surface. Offline integrity is distinct from chain anchoring.
+- Automatic spending caps, independent-source minimums, and request/receipt
+  binding are enforced. Non-local writes require authorization and configured
+  chain funding; no silent simulation fallback.
+- [Cross-team research and implementation rationale](winner-research.md)
+  documents awards, source-code findings, limitations and expected value.
+
 ## What it does
 
 When an AI agent cannot find enough evidence for a claim, Gap402 lets it

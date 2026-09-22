@@ -42,6 +42,13 @@ pnpm demo
 
 Then explore:
 
+Open `/lab` for the interactive evidence walkthrough (isolated simulation,
+no wallet or spend), and `/verify` to inspect a portable proof in your browser.
+Receipt pages export the original bounty, payout plan and receipt together.
+See [cross-team winner research](docs/winner-research.md) for the sources and
+implementation decisions behind these improvements, and the
+[verification record](docs/verification-2026-09-22.md) for executed checks and limits.
+
 ```bash
 # API + web UI
 pnpm --filter @gap402/api start     # http://127.0.0.1:4020
@@ -212,7 +219,9 @@ pnpm --filter @gap402/example-mcp-client start
 ```
 
 Tools: `gap402_create_gap`, `gap402_get_gap`, `gap402_search_open_gaps`,
-`gap402_submit_evidence`, `gap402_get_receipt`.
+`gap402_submit_evidence`, `gap402_get_receipt`, `gap402_cancel_gap`,
+`gap402_get_proof`. Non-local writes require `GAP402_WRITE_TOKEN` on the server
+and CLI/MCP; SDK callers pass `writeToken`. See the deployment runbook.
 
 ## Tests
 

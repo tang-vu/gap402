@@ -10,6 +10,8 @@ export interface Health {
   bountyContract: string | null;
   verifierAddress: string;
   explorer: string | null;
+  settlementMode: string;
+  verificationMode: string;
 }
 
 export interface Gap {
@@ -141,9 +143,18 @@ export interface GapDetail extends GapView {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
-  if (!res.ok) throw new Error(`${path} -> ${res.status}`);
+  const res = await fetch(`${API_BASE}${path}`, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new ApiError(res.status);
   return (await res.json()) as T;
+}
+
+export class ApiError extends Error {
+  constructor(public status: number) {
+    super(`Market request failed (${status})`);
+  }
 }
 
 export const api = {
@@ -152,6 +163,7 @@ export const api = {
   gapDetail: (id: string) => get<GapDetail>(`/api/gaps/${id}`),
   receipt: (id: string) => get<Receipt>(`/api/receipts/${id}`),
   receiptByBounty: (id: string) => get<Receipt>(`/api/gaps/${id}/receipt`),
+  proof: (id: string) => get<unknown>(`/api/gaps/${encodeURIComponent(id)}/proof`),
 };
 
 export function fmtUsdc(units: string | bigint): string {

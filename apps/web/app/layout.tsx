@@ -24,6 +24,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="/">market</a>
               <a href="/gaps">gaps</a>
               <a href="/receipts">receipts</a>
+              <a href="/lab">evidence lab</a>
+              <a href="/verify">verify proof</a>
               <a href="https://github.com/tang-vu/gap402">github</a>
             </nav>
           </div>

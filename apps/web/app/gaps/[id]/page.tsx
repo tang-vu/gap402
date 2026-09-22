@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { api, fmtUsdc, short, type Receipt } from "../../../lib/api";
+import { api, ApiError, fmtUsdc, short, type Receipt } from "../../../lib/api";
 import { Lifecycle } from "../../../components/lifecycle";
 import { EvidenceGraph } from "../../../components/evidence-graph";
 import { SettlementGraph } from "../../../components/settlement-graph";
@@ -16,8 +16,9 @@ export default async function GapDetailPage({
   let detail;
   try {
     detail = await api.gapDetail(id);
-  } catch {
-    notFound();
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) notFound();
+    throw e;
   }
   const { gap, runtime, submissions, evaluations, plan, explorer } = detail;
   let receipt: Receipt | null = null;
@@ -33,6 +34,11 @@ export default async function GapDetailPage({
     <main className="container">
       <section className="block">
         <h3>Gap · {gap.id}</h3>
+        <p className="notice">
+          {runtime.fundTxHash
+            ? "Funding transaction recorded. Follow the transaction links to inspect settlement."
+            : "OFFCHAIN SIMULATION — no escrow funding transaction recorded."}
+        </p>
         <Lifecycle status={gap.status} />
         <div className="grid-2" style={{ marginTop: 16 }}>
           <div className="panel">

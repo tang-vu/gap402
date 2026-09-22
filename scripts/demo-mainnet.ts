@@ -81,6 +81,8 @@ async function main() {
     throw new ConfigError("GAP402_NETWORK must be mainnet for this script");
   if (process.env.DEMO_CONFIRM !== "YES")
     throw new ConfigError("DEMO_CONFIRM=YES required — real USDC will be spent");
+  if (!process.env.GAP402_WRITE_TOKEN)
+    throw new ConfigError("GAP402_WRITE_TOKEN required for authenticated mainnet writes");
   const requesterKey = process.env.PRIVATE_KEY as `0x${string}` | undefined;
   const verifierKey = process.env.VERIFIER_PRIVATE_KEY as `0x${string}` | undefined;
   const contract = process.env.GAP_BOUNTY_ADDRESS as `0x${string}` | undefined;
@@ -138,6 +140,7 @@ async function main() {
   const buyer = new AutonomousBuyer(
     new Gap402({
       api,
+      writeToken: process.env.GAP402_WRITE_TOKEN,
       requester: { id: "mainnet-demo", kind: "service", address: requester },
     }),
     {
@@ -183,6 +186,7 @@ async function main() {
   step(4, "evaluate + settle ON MAINNET");
   const fin: any = await fetch(`${api}/api/gaps/${gapId}/finalize`, {
     method: "POST",
+    headers: { authorization: `Bearer ${process.env.GAP402_WRITE_TOKEN}` },
   }).then((r) => r.json());
   line(`  settlement tx: ${fin.settlementTx}`);
   line(`  explorer: ${explorerTxUrl(network.explorerUrl, fin.settlementTx ?? "") ?? ""}`);
@@ -203,7 +207,8 @@ async function main() {
   await app.close();
 }
 
-const client0 = (api: string) => new Gap402({ api });
+const client0 = (api: string) =>
+  new Gap402({ api, writeToken: process.env.GAP402_WRITE_TOKEN });
 
 main().catch((e) => {
   console.error(e instanceof ConfigError ? `ABORTED: ${e.message}` : e);

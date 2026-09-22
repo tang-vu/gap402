@@ -12,6 +12,7 @@ import { Gap402 } from "@gap402/sdk";
 
 const client = new Gap402({
   api: process.env.GAP402_API ?? "http://127.0.0.1:4020",
+  writeToken: process.env.GAP402_WRITE_TOKEN,
 });
 
 const server = new McpServer({
@@ -22,6 +23,16 @@ const server = new McpServer({
 const text = (v: unknown) => ({
   content: [{ type: "text" as const, text: JSON.stringify(v, null, 2) }],
 });
+
+server.registerTool(
+  "gap402_get_proof",
+  {
+    description:
+      "Export the bounty specification, settlement plan and receipt for independent offline integrity checks. Does not prove source truth or query the chain.",
+    inputSchema: { id: z.string() },
+  },
+  async ({ id }) => text(await client.getProof(id)),
+);
 
 server.registerTool(
   "gap402_create_gap",

@@ -2,7 +2,7 @@ import { describe, expect, it, beforeAll, afterAll } from "vitest";
 import { buildServer } from "../src/server.js";
 import { Store } from "../src/store.js";
 import { resolveNetwork } from "@gap402/config";
-import { computeReceiptHash } from "@gap402/protocol";
+import { computeReceiptHash, verifyBundle } from "@gap402/protocol";
 import { Gap402 } from "@gap402/sdk";
 import { MockSemanticProvider } from "@gap402/verifier";
 import type { FastifyInstance } from "fastify";
@@ -97,6 +97,8 @@ describe("e2e: sdk client over real http", () => {
 
     const byBounty = await gap.getReceiptByBounty(gapId);
     expect(byBounty?.id).toBe(receipt.id);
+    const proof = await gap.getProof(gapId);
+    expect(verifyBundle(proof).valid).toBe(true);
 
     const settled = await gap.waitForEvidence(gapId, {
       intervalMs: 50,

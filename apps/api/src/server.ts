@@ -3,11 +3,12 @@ import { z } from "zod";
 import { privateKeyToAccount } from "viem/accounts";
 import { resolveNetwork, type NetworkConfig, explorerTxUrl } from "@gap402/config";
 import { Gap402Chain } from "@gap402/sdk";
-import { computeSpecHash } from "@gap402/protocol";
+import { computeSpecHash, verifyBundle } from "@gap402/protocol";
 import { bytes32Schema, evmAddressSchema } from "@gap402/schemas";
 import type { SemanticProvider } from "@gap402/verifier";
 import { DuplicateError, Store } from "./store.js";
 import { GapService } from "./service.js";
+import { runDemo } from "./demo.js";
 
 export interface ApiDeps {
   store?: Store;
@@ -39,7 +40,29 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
   const chain = new Gap402Chain(network);
 
   const app = Fastify({ logger: false });
+  // A public read-only explorer must never expose a server wallet to anonymous writes.
+  const writeToken = process.env.GAP402_WRITE_TOKEN;
+  app.addHook("onRequest", async (req, reply) => {
+    if (req.method === "GET" || req.method === "HEAD") return;
+    if (req.routeOptions.url === "/api/demo") return; // isolated memory-only simulation
+    if (writeToken && req.headers.authorization !== `Bearer ${writeToken}`) {
+      return reply.code(401).send({ error: "write authorization required" });
+    }
+    if (network.name !== "local" && !writeToken) {
+      return reply
+        .code(503)
+        .send({ error: "configure GAP402_WRITE_TOKEN before enabling non-local writes" });
+    }
+  });
   app.addContentTypeParser("*", (_req, _payload, done) => done(null));
+  app.post("/api/demo", async (req) => {
+    const { scenario } = z
+      .object({
+        scenario: z.enum(["mixed", "rejected", "insufficient"]).default("mixed"),
+      })
+      .parse(req.body ?? {});
+    return runDemo(scenario);
+  });
 
   app.get("/api/health", async () => ({
     ok: true,
@@ -49,6 +72,12 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
     bountyContract: bountyContract ?? null,
     verifierAddress,
     explorer: network.explorerUrl,
+    settlementMode:
+      bountyContract && requesterKey && verifierKey
+        ? "onchain-configured"
+        : "offchain-simulation",
+    verificationMode: deps.semantic?.name ?? process.env.VERIFIER_PROVIDER ?? "mock",
+    sourceVerification: "supplier-declared; verifier does not fetch source pages",
   }));
 
   const createSchema = z.object({
@@ -75,11 +104,28 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
 
   app.post("/api/gaps", async (req, reply) => {
     const body = createSchema.parse(req.body ?? {});
+    if (network.name !== "local" && (!bountyContract || !requesterKey || !verifierKey)) {
+      return reply.code(503).send({
+        error:
+          "non-local bounties require contract, requester and verifier keys; simulation is local only",
+      });
+    }
+    if (body.deadline && new Date(body.deadline).getTime() <= Date.now()) {
+      return reply.code(400).send({ error: "deadline must be in the future" });
+    }
     const requesterAddress = (body.requester?.address ??
       (requesterKey ? privateKeyToAccount(requesterKey).address : undefined)) as
       `0x${string}` | undefined;
     if (!requesterAddress) {
       return reply.code(400).send({ error: "requester.address or PRIVATE_KEY required" });
+    }
+    if (
+      bountyContract &&
+      requesterKey &&
+      requesterAddress.toLowerCase() !==
+        privateKeyToAccount(requesterKey).address.toLowerCase()
+    ) {
+      return reply.code(400).send({ error: "requester must match the funding signer" });
     }
     const { gap, runtime } = service.createGap({
       question: body.question,
@@ -264,8 +310,15 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
     // evaluate anything pending
     await service.evaluateGap(id);
     const plan = service.buildPlan(id);
-    service.savePlan(plan);
     const runtime = service.getRuntime(id);
+    if (
+      network.name !== "local" &&
+      (!bountyContract || runtime.chainBountyId === undefined)
+    ) {
+      return reply
+        .code(409)
+        .send({ error: "cannot finalize a non-local bounty without its onchain escrow" });
+    }
 
     // Build the receipt ONCE — its hash is anchored by finalize. settlementTx
     // is attached afterwards and excluded from receiptHash (it records where
@@ -290,6 +343,8 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
       );
       receipt.settlementTx = settlementTx;
     }
+    // Persist only the plan whose settlement succeeded, never a failed retry's plan.
+    service.savePlan(plan);
     service.saveReceipt(receipt);
     service.markRuntime(id, {
       ...(settlementTx ? { settlementTxHash: settlementTx } : {}),
@@ -312,6 +367,25 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
     const receipt = service.getReceiptByBounty(id);
     if (!receipt) return reply.code(404).send({ error: "no receipt" });
     return receipt;
+  });
+
+  app.get("/api/gaps/:id/proof", async (req, reply) => {
+    const { id } = req.params as { id: string };
+    const gap = service.getGap(id);
+    const plan = service.getPlan(id);
+    const receipt = service.getReceiptByBounty(id);
+    if (!gap || !plan || !receipt)
+      return reply.code(404).send({ error: "settled proof not available" });
+    const bundle = { gap, plan, receipt };
+    return {
+      ...bundle,
+      integrity: verifyBundle(bundle),
+      settlement: receipt.settlementTx
+        ? "transaction-recorded; verify anchor independently"
+        : "offchain-simulation",
+      sourceVerification:
+        "supplier-declared metadata; content hashes are commitments, not truth proofs",
+    };
   });
 
   app.get("/api/receipts", async () => ({
@@ -380,8 +454,24 @@ export async function buildServer(deps: ApiDeps = {}): Promise<FastifyInstance> 
         issues: err.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
       });
     }
-    reply.code(500).send({ error: err instanceof Error ? err.message : String(err) });
+    const message = err instanceof Error ? err.message : String(err);
+    if (/insufficient independent|not accepting|deadline has passed/.test(message))
+      return reply.code(409).send({ error: message });
+    if (/content hash does not match|Unsupported scheme|Invalid URL/.test(message))
+      return reply.code(400).send({ error: message });
+    if (/^gap .* not found$/.test(message))
+      return reply.code(404).send({ error: "not found" });
+    reqLogError(message);
+    reply.code(500).send({
+      error:
+        "operation failed; inspect server logs and reconcile onchain state before retrying",
+    });
   });
 
   return app;
+}
+
+function reqLogError(message: string) {
+  // Do not reflect upstream model responses or RPC internals to public clients.
+  console.error("gap402 operation failed", message.slice(0, 500));
 }

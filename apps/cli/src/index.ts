@@ -2,12 +2,13 @@
 import { Command } from "commander";
 import { readFileSync } from "node:fs";
 import { Gap402, Gap402Chain } from "@gap402/sdk";
-import { computeReceiptHash } from "@gap402/protocol";
+import { computeReceiptHash, verifyBundle } from "@gap402/protocol";
 import { evidenceReceiptSchema, type EvidenceReceipt } from "@gap402/schemas";
 import { formatUsdcAmount, resolveNetwork, ConfigError } from "@gap402/config";
 
 const API = () => process.env.GAP402_API ?? "http://127.0.0.1:4020";
-const client = () => new Gap402({ api: API() });
+const client = () =>
+  new Gap402({ api: API(), writeToken: process.env.GAP402_WRITE_TOKEN });
 
 const out = (v: unknown) => console.log(JSON.stringify(v, null, 2));
 const fail = (msg: string): never => {
@@ -16,6 +17,18 @@ const fail = (msg: string): never => {
 };
 
 const program = new Command();
+program
+  .command("proof-export")
+  .argument("<gapId>")
+  .action(async (id) => out(await client().getProof(id)));
+program
+  .command("proof-verify")
+  .argument("<file>")
+  .action((file) => {
+    const result = verifyBundle(JSON.parse(readFileSync(file, "utf8")));
+    out(result);
+    if (!result.valid) process.exitCode = 1;
+  });
 program
   .name("gap402")
   .description("gap402 — turn uncertainty into a market")

@@ -69,3 +69,22 @@ screen recording of the web UI against the same run.
   lifecycle timeline, evidence graph, and settlement graph live.
 - The banner reads **LOCAL** under arc-anvil; a mainnet recording shows
   **ARC MAINNET** with live explorer links.
+# Interactive reviewer path
+
+Start `pnpm dev`, open `/lab`, and state that the walkthrough uses synthetic
+sources, a mock verifier and no blockchain spending. Choose the mixed scenario.
+Show the unsupported claim, fixed 0.05 USDC simulated budget, two useful sources,
+rejected stale rumor, and tracking-link duplicate. Show recipient payouts,
+verifier fee and refund. The sum is exact; it is not a business revenue metric.
+
+Click **Verify in browser**, download JSON, then change a payout and verify
+again. Explain that consistency checks are separate from registry authenticity
+and factual truth. Run **Insufficient independent sources**: the agent refuses
+settlement. Run **All evidence rejected**: no supplier earns a payout, the
+verifier fee is visible and the agent abstains.
+
+Then show `pnpm demo` for actual escrow, settlement, registry anchor and deadline
+reclaim transactions on **local Arc emulation**. Sources remain fixtures.
+For a grant submission replace the local transaction evidence with an actual
+mainnet deployment and receipt, using the guarded mainnet runbook. Do not show
+the Lab's zero-spend result as a mainnet payment.

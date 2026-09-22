@@ -17,6 +17,7 @@ import { parseUsdcAmount } from "@gap402/config";
  */
 export interface Gap402Options {
   api: string;
+  writeToken?: string | undefined;
   /** Requester identity attached to created gaps. */
   requester?: {
     id: string;
@@ -50,17 +51,22 @@ export class Gap402 {
   private api: string;
   private fetchImpl: typeof fetch;
   private requester?: Gap402Options["requester"];
+  private writeToken: string | undefined;
 
   constructor(opts: Gap402Options) {
     this.api = opts.api.replace(/\/$/, "");
     this.fetchImpl = opts.fetchImpl ?? fetch;
     this.requester = opts.requester;
+    this.writeToken = opts.writeToken;
   }
 
   private async req<T>(method: string, path: string, body?: unknown): Promise<T> {
-    const init: RequestInit = { method };
+    const headers: Record<string, string> = {};
+    if (method !== "GET" && this.writeToken)
+      headers.authorization = `Bearer ${this.writeToken}`;
+    const init: RequestInit = { method, headers, signal: AbortSignal.timeout(30_000) };
     if (body !== undefined) {
-      init.headers = { "content-type": "application/json" };
+      headers["content-type"] = "application/json";
       init.body = JSON.stringify(body);
     }
     const res = await this.fetchImpl(`${this.api}${path}`, init);
@@ -87,6 +93,13 @@ export class Gap402 {
 
   async getGap(id: string): Promise<GapView> {
     return this.req<GapView>("GET", `/api/gaps/${id}`);
+  }
+
+  async getProof(id: string) {
+    return this.req<{ gap: GapRequest; plan: SettlementPlan; receipt: EvidenceReceipt }>(
+      "GET",
+      `/api/gaps/${encodeURIComponent(id)}/proof`,
+    );
   }
 
   async listGaps(filter?: { status?: string }): Promise<{ gaps: GapView[] }> {

@@ -134,6 +134,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@gap402/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
       next:
         specifier: ^15.5.4
         version: 15.5.25(@types/node@22.20.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)

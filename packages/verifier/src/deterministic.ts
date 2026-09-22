@@ -26,13 +26,17 @@ export function runDeterministicChecks(
   const push = (name: string, passed: boolean, detail?: string) =>
     checks.push({ name, passed, ...(detail ? { detail } : {}) });
 
-  // 1. URL resolvable + well-formed (canonicalization already applied)
+  // 1. Syntax only: no network retrieval or publisher authentication is implied.
   let host = "";
   try {
     host = domainOf(sub.canonicalUrl);
-    push("url_resolvable", /^https?:\/\//.test(sub.canonicalUrl));
+    push(
+      "url_format",
+      /^https?:\/\//.test(sub.canonicalUrl),
+      "syntax only; source not fetched by verifier",
+    );
   } catch {
-    push("url_resolvable", false, "unparseable URL");
+    push("url_format", false, "unparseable URL");
   }
 
   // 2. duplicate detection: canonical URL or content hash collision

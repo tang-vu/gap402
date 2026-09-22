@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeAll, afterAll } from "vitest";
+import { describe, expect, it, beforeAll, afterAll, afterEach, vi } from "vitest";
 import { buildServer } from "../src/server.js";
 import { Store } from "../src/store.js";
 import { resolveNetwork } from "@gap402/config";
@@ -10,6 +10,7 @@ const SUPPLIER_A = "0x2000000000000000000000000000000000000002";
 const SUPPLIER_B = "0x3000000000000000000000000000000000000003";
 
 let app: FastifyInstance;
+afterEach(() => vi.useRealTimers());
 
 beforeAll(async () => {
   app = await buildServer({
@@ -174,6 +175,7 @@ describe("gap lifecycle", () => {
   });
 
   it("rejects submissions after the deadline", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
     const res = await app.inject({
       method: "POST",
       url: "/api/gaps",
@@ -183,20 +185,23 @@ describe("gap lifecycle", () => {
         requirements: {},
         budgetUnits: "1000",
         requester: { address: REQUESTER },
-        deadline: new Date(Date.now() - 1000).toISOString(),
+        deadline: new Date(Date.now() + 1000).toISOString(),
       },
     });
     const { gap } = res.json();
+    expect(res.statusCode).toBe(201);
+    vi.setSystemTime(Date.now() + 2000);
     const sub = await app.inject({
       method: "POST",
       url: `/api/gaps/${gap.id}/submissions`,
       payload: { url: "https://x.example.com/late", supplierAddress: SUPPLIER_A },
     });
-    expect(sub.statusCode).toBe(500);
+    expect(sub.statusCode).toBe(409);
     expect(sub.json().error).toContain("deadline");
   });
 
   it("expires a past-deadline gap on read and allows cancel", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
     const res = await app.inject({
       method: "POST",
       url: "/api/gaps",
@@ -206,11 +211,12 @@ describe("gap lifecycle", () => {
         requirements: {},
         budgetUnits: "1000",
         requester: { address: REQUESTER },
-        deadline: new Date(Date.now() - 1000).toISOString(),
+        deadline: new Date(Date.now() + 1000).toISOString(),
       },
     });
     const { gap } = res.json();
-
+    expect(res.statusCode).toBe(201);
+    vi.setSystemTime(Date.now() + 2000);
     const view = await app.inject({ method: "GET", url: `/api/gaps/${gap.id}` });
     expect(view.json().gap.status).toBe("expired");
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { api, fmtUsdc, short } from "../../../lib/api";
+import { api, ApiError, fmtUsdc, short } from "../../../lib/api";
+import { ProofInspector } from "../../../components/proof-inspector";
 
 export const dynamic = "force-dynamic";
 
@@ -13,18 +14,32 @@ export default async function ReceiptPage({
   let receipt;
   try {
     receipt = await api.receipt(id);
-  } catch {
-    notFound();
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) notFound();
+    throw e;
   }
   const paidSum = receipt.acceptedEvidence.reduce(
     (s, e) => s + BigInt(e.payoutUnits),
     0n,
   );
+  let bundle: unknown;
+  try {
+    bundle = await api.proof(receipt.bountyId);
+  } catch {
+    /* old receipt may have no stored plan */
+  }
 
   return (
     <main className="container">
       <section className="block">
         <h3>Evidence receipt · {receipt.id}</h3>
+        <p className="notice">
+          {receipt.settlementTx
+            ? "Settlement transaction recorded; verify its registry anchor independently."
+            : "OFFCHAIN SIMULATION — no settlement transaction recorded."}{" "}
+          Evidence metadata is supplier-declared. Verification is a judgment, not proof of
+          truth.
+        </p>
         <div className="panel">
           <dl className="kv">
             <dt>claim</dt>
@@ -116,6 +131,11 @@ export default async function ReceiptPage({
           <span className="mono">gap402 receipt verify {receipt.id}</span>
         </p>
       </section>
+      {bundle ? (
+        <ProofInspector initialBundle={bundle} />
+      ) : (
+        <p className="muted">Full proof bundle unavailable for this receipt.</p>
+      )}
     </main>
   );
 }

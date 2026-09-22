@@ -12,7 +12,12 @@ import {
   type SettlementPlan,
 } from "@gap402/schemas";
 import { computeReceiptHash, computeSpecHash } from "@gap402/protocol";
-import { canonicalizeUrl, contentHashOf, sanitizeForPrompt } from "@gap402/evidence";
+import {
+  canonicalizeUrl,
+  contentHashOf,
+  sanitizeForPrompt,
+  rootDomain,
+} from "@gap402/evidence";
 import {
   evaluateSubmission,
   providerFromEnv,
@@ -53,8 +58,8 @@ export class GapService {
       ? new Date(input.deadline)
       : new Date(now.getTime() + (input.deadlineSeconds ?? 3600) * 1000);
     const requirements = evidenceRequirementSchema.parse({
-      claim: input.claim,
       ...input.requirements,
+      claim: input.claim,
     });
     const gap = gapRequestSchema.parse({
       protocol: "gap402",
@@ -152,13 +157,20 @@ export class GapService {
     if (new Date() > new Date(gap.deadline)) {
       throw new Error("bounty deadline has passed");
     }
-    if (!["open", "submissions", "funded"].includes(gap.status)) {
+    if (!["open", "submissions", "funded", "verified"].includes(gap.status)) {
       throw new Error(`bounty not accepting submissions (${gap.status})`);
     }
 
     const canonicalUrl = canonicalizeUrl(input.url);
     const contentHash =
-      input.contentHash ?? contentHashOf(input.excerpt ?? input.content ?? input.url);
+      input.contentHash ?? contentHashOf(input.content ?? input.excerpt ?? input.url);
+    if (
+      input.contentHash &&
+      input.content !== undefined &&
+      contentHashOf(input.content) !== input.contentHash
+    ) {
+      throw new Error("content hash does not match supplied content");
+    }
 
     const existing = this.store.findSubmissionByUrl<EvidenceSubmission>(
       gapId,
@@ -191,7 +203,7 @@ export class GapService {
       submittedAt: new Date().toISOString(),
     });
     this.store.insert("submission", submission, gapId);
-    if (gap.status === "open" || gap.status === "funded") {
+    if (gap.status === "open" || gap.status === "funded" || gap.status === "verified") {
       this.setStatus(gapId, "submissions");
     }
     return { submission, duplicate: false };
@@ -248,6 +260,17 @@ export class GapService {
     if (!gap) throw new Error(`gap ${gapId} not found`);
     const subs = this.listSubmissions(gapId);
     const evals = this.listEvaluations(gapId);
+    const accepted = new Set(
+      evals.filter((e) => e.verdict === "accepted").map((e) => e.submissionId),
+    );
+    const domains = new Set(
+      subs.filter((s) => accepted.has(s.id)).map((s) => rootDomain(s.canonicalUrl)),
+    );
+    if (domains.size < gap.requirements.minIndependentSources) {
+      throw new Error(
+        `insufficient independent source domains: ${domains.size}/${gap.requirements.minIndependentSources}`,
+      );
+    }
     const plan = buildSettlementPlan({
       planId: nid("plan"),
       bountyId: gapId,
@@ -334,7 +357,7 @@ export class GapService {
       ...(ctx.settlementTx ? { settlementTx: ctx.settlementTx } : {}),
       settlementHash: plan.settlementHash,
       receiptHash: ("0x" + "0".repeat(64)) as `0x${string}`,
-      evaluatorVersion: "gap402-verifier-1.0.0",
+      evaluatorVersion: evals[0]?.evaluatorVersion ?? "gap402-verifier-1.0.0+unevaluated",
       network: ctx.network,
       createdAt: new Date().toISOString(),
     };
