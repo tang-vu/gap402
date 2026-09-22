@@ -25,6 +25,10 @@ question
 
 ## Quickstart
 
+**[Open the public demo](https://gap402.tangvu.dev)** — interactive sandbox with
+synthetic evidence and zero actual spend. This is not a mainnet deployment.
+See [self-hosting operations](docs/self-hosting.md) for the PM2/Cloudflare setup.
+
 Prereqs: Node 22+, pnpm 11+, and Arc Foundry (`arc-anvil`, `arc-forge`)
 for local chain emulation and contract tests.
 
