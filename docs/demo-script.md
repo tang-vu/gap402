@@ -88,3 +88,37 @@ reclaim transactions on **local Arc emulation**. Sources remain fixtures.
 For a grant submission replace the local transaction evidence with an actual
 mainnet deployment and receipt, using the guarded mainnet runbook. Do not show
 the Lab's zero-spend result as a mainnet payment.
+
+## Evidence exchange walkthrough / current UI
+
+1. Open `/` and introduce the dossier: “When evidence is missing, create a market
+   for it.” The cover and five chapters are labeled illustrative fixtures. Select
+   source 02 and follow its identity into inspection, allocation and the record.
+2. Open `/lab`, choose **A useful discovery**, and **Run this experiment**.
+   State that this is a completed-response replay with synthetic sources and mock
+   semantic scores. Actual spend is zero; the simulated budget is 0.050000 USDC.
+3. Move to **Source inspection**. Select source 02 by mouse or keyboard. Open its
+   five evaluation scores and identity disclosure. Select the stale rumor to show
+   the returned rejection. Point out that the tracking-link repost was prevented
+   from becoming another submission, rather than showing it as a paid fourth row.
+4. Move to **Allocation**. The selected source stays identifiable. Read the actual
+   returned amount and allocation explanation; do not narrate fixed sample payout
+   amounts. Select the verifier fee and refund. Supplier amounts + fee + refund
+   reconcile exactly; the fee already belongs to the plan's payout rows.
+5. Move to **Portable receipt**, follow the inspector link, and **Verify in browser**.
+   Download the original bundle. Edit a payout; stale verification disappears.
+   Verify again to show tamper failure. These checks establish consistency, not
+   factual truth or independent registry authentication.
+6. Switch to **Almost enough** and run. The unmet domain requirement stops
+   allocation: no plan and no receipt. Then run **Nothing holds up**: no supplier
+   earns a payout, while the verifier fee and refund are explicitly accounted for.
+7. Return to the market register and receipt archive. Only actual API records are
+   shown. A missing funding/settlement transaction is never inferred from a
+   lifecycle label. On an empty environment, use the lab rather than inventing
+   market activity. Replay and restart reuse the completed response without spending
+   or sending extra requests.
+
+The review screenshot set uses a loopback-only fixture adapter. It is not the
+public market and must not be narrated as real supplier activity. See
+[frontend-design.md](frontend-design.md) for the visual system, route captures,
+production review commands and exact validation findings.
