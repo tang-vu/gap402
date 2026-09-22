@@ -22,21 +22,30 @@ export function EvidenceGraph({
 
   const color = (s: Submission): string => {
     const e = verdict.get(s.id);
-    if (!e) return "#8b939e"; // pending
+    if (!e) return "var(--muted)"; // pending
     if (e.verdict === "rejected") {
-      return e.rejectReasons.some((r) => r.includes("duplicate")) ? "#d9a441" : "#e05d5d";
+      return e.rejectReasons.some((r) => r.includes("duplicate"))
+        ? "var(--warn)"
+        : "var(--bad)";
     }
-    return s.claimRelation === "contradicts" ? "#d9a441" : "#3fb96d";
+    return s.claimRelation === "contradicts" ? "var(--warn)" : "var(--ok)";
   };
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="evidence graph">
-      <circle cx={cx} cy={cy} r={46} fill="#161a20" stroke="#4f8ef7" strokeWidth={1.5} />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={46}
+        fill="var(--panel-2)"
+        stroke="var(--accent)"
+        strokeWidth={1.5}
+      />
       <text
         x={cx}
         y={cy - 4}
         textAnchor="middle"
-        fill="#e6e9ed"
+        fill="var(--text)"
         fontSize={10}
         fontFamily="monospace"
       >
@@ -46,7 +55,7 @@ export function EvidenceGraph({
         x={cx}
         y={cy + 10}
         textAnchor="middle"
-        fill="#8b939e"
+        fill="var(--muted)"
         fontSize={8}
         fontFamily="monospace"
       >
@@ -66,12 +75,19 @@ export function EvidenceGraph({
         })();
         return (
           <g key={s.id}>
-            <line x1={cx} y1={cy} x2={x} y2={y} stroke="#23282f" strokeDasharray="3 3" />
+            <line
+              x1={cx}
+              y1={cy}
+              x2={x}
+              y2={y}
+              stroke="var(--border)"
+              strokeDasharray="3 3"
+            />
             <circle
               cx={x}
               cy={y}
               r={22}
-              fill="#111418"
+              fill="var(--panel)"
               stroke={color(s)}
               strokeWidth={1.5}
             />
@@ -89,7 +105,7 @@ export function EvidenceGraph({
               x={x}
               y={y + 9}
               textAnchor="middle"
-              fill="#8b939e"
+              fill="var(--muted)"
               fontSize={7}
               fontFamily="monospace"
             >
@@ -99,7 +115,7 @@ export function EvidenceGraph({
               x={x}
               y={y + 32}
               textAnchor="middle"
-              fill="#8b939e"
+              fill="var(--muted)"
               fontSize={7}
               fontFamily="monospace"
             >
@@ -113,7 +129,7 @@ export function EvidenceGraph({
           x={cx}
           y={cy + 80}
           textAnchor="middle"
-          fill="#8b939e"
+          fill="var(--muted)"
           fontSize={10}
           fontFamily="monospace"
         >

@@ -1,0 +1,22 @@
+[
+  {
+    "route": "/",
+    "violations": []
+  },
+  {
+    "route": "/lab",
+    "violations": []
+  },
+  {
+    "route": "/verify",
+    "violations": []
+  },
+  {
+    "route": "/gaps",
+    "violations": []
+  },
+  {
+    "route": "/receipts",
+    "violations": []
+  }
+]

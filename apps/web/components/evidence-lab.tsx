@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { verifyBundle } from "@gap402/protocol";
 import {
   fmtUsdc,
@@ -29,6 +29,16 @@ export function EvidenceLab() {
   const [run, setRun] = useState<Run | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const resultRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (run)
+      resultRef.current?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+  }, [run]);
   async function start() {
     setBusy(true);
     setError("");
@@ -52,35 +62,90 @@ export function EvidenceLab() {
   return (
     <>
       <section className="panel lab-controls">
-        <p className="notice">
-          <strong>SIMULATION · No wallet needed · Actual spend: 0 USDC</strong>
-          <br />
-          Sources are invented, semantic scoring is a deterministic mock, and payments are
-          calculated without a blockchain transaction. Runs are isolated from the live
-          market.
-        </p>
-        <label htmlFor="scenario">Evidence scenario</label>
-        <select
-          id="scenario"
-          value={scenario}
-          onChange={(e) => setScenario(e.target.value)}
-          disabled={busy}
-        >
-          <option value="mixed">Useful evidence + stale rumor + duplicate</option>
-          <option value="rejected">All evidence rejected — agent abstains</option>
-          <option value="insufficient">
-            Insufficient independent sources — settlement blocked
-          </option>
-        </select>
-        <button className="btn primary" onClick={start} disabled={busy}>
-          {busy ? "Evaluating evidence…" : "Run evidence bounty"}
-        </button>
-        <p role="status" aria-live="polite">
-          {busy ? "Checking sources and calculating the portfolio…" : error}
-        </p>
+        <div className="simulation-note">
+          <div>
+            <strong>Sandbox / No wallet required</strong>
+            <p>
+              Invented sources. Mock semantic scoring. Real allocation logic. This
+              isolated simulation never submits a blockchain transaction.
+            </p>
+          </div>
+          <div className="simulation-spend">
+            Actual spend<b>0 USDC</b>
+          </div>
+        </div>
+        <fieldset className="scenario-grid" disabled={busy}>
+          <legend>01 / Choose your evidence</legend>
+          {(
+            [
+              [
+                "mixed",
+                "A useful discovery",
+                "Two useful sources, a stale rumor, and a duplicate. See what earns a reward.",
+              ],
+              [
+                "rejected",
+                "Nothing holds up",
+                "Every source fails. See where the budget goes when the agent must abstain.",
+              ],
+              [
+                "insufficient",
+                "Almost enough",
+                "Useful sources, but not enough independent domains. Settlement must wait.",
+              ],
+            ] as const
+          ).map(([value, title, description], i) => (
+            <label className="scenario-choice" key={value}>
+              <input
+                type="radio"
+                name="scenario"
+                value={value}
+                checked={scenario === value}
+                onChange={() => {
+                  setScenario(value);
+                  setRun(null);
+                  setError("");
+                }}
+              />
+              <span className="scenario-number">CASE / 0{i + 1}</span>
+              <strong>{title}</strong>
+              <small>{description}</small>
+            </label>
+          ))}
+        </fieldset>
+        <div className="lab-action">
+          <button className="btn primary" onClick={start} disabled={busy}>
+            {busy ? "Evaluating evidence…" : "Run this experiment"}{" "}
+            <span aria-hidden="true">↗</span>
+          </button>
+          <p role="status" aria-live="polite">
+            {busy
+              ? "Checking sources and calculating the portfolio…"
+              : error || "0.05 USDC simulated budget · No actual spend"}
+          </p>
+        </div>
       </section>
+      {!run && !busy && !error && (
+        <div className="lab-intro">
+          <span aria-hidden="true">↳</span>
+          <h3>What does good evidence earn?</h3>
+          <p>
+            Pick a case and run the experiment. Follow each source from acceptance checks
+            to allocation, then inspect the final proof yourself.
+          </p>
+        </div>
+      )}
       {run && (
-        <div aria-live="polite">
+        <div>
+          <div className="run-summary" ref={resultRef} role="status">
+            <p>
+              <strong>Experiment complete.</strong>{" "}
+              {run.blockedReason
+                ? "The source requirement stopped settlement."
+                : "Every unit accounted for. The proof is ready to inspect."}
+            </p>
+            <span className="mono">SIMULATION / 0 USDC SPENT</span>
+          </div>
           <section className="block lab-grid">
             <article className="panel">
               <div className="tagline">01 · Detect</div>
@@ -139,7 +204,7 @@ export function EvidenceLab() {
             <h3>04 · Settle or refuse</h3>
             {run.plan ? (
               <div className="panel">
-                <table className="market">
+                <table className="market payout-table">
                   <thead>
                     <tr>
                       <th>Recipient / role</th>
@@ -150,13 +215,15 @@ export function EvidenceLab() {
                   <tbody>
                     {run.plan.payouts.map((p) => (
                       <tr key={p.submissionId}>
-                        <td className="mono">
+                        <td className="mono" data-label="Recipient">
                           {p.submissionId === "verifier-fee"
                             ? "Verifier"
                             : `${p.recipient.slice(0, 10)}…`}
                         </td>
-                        <td>{fmtUsdc(p.amountUnits)} USDC</td>
-                        <td>
+                        <td data-label="Simulated payout">
+                          {fmtUsdc(p.amountUnits)} USDC
+                        </td>
+                        <td data-label="Reason">
                           {p.explanation.note ??
                             `Quality ${p.explanation.quality}; ${p.explanation.capped ? "share capped" : "proportional share"}`}
                         </td>

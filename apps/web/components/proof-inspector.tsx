@@ -9,6 +9,20 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
   );
   const [result, setResult] = useState<ReturnType<typeof verifyBundle> | null>(null);
   const [error, setError] = useState("");
+  async function openFile(file: File | undefined) {
+    if (!file) return;
+    setResult(null);
+    setError("");
+    if (file.size > 1000000) {
+      setError("Choose a JSON proof smaller than 1 MB.");
+      return;
+    }
+    try {
+      setText(await file.text());
+    } catch {
+      setError("This file could not be read. Try pasting its JSON below.");
+    }
+  }
   function check() {
     setError("");
     setResult(null);
@@ -36,7 +50,19 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
         specification, payout recipients, exact budget and receipt hash. Try changing a
         payout to see the check fail.
       </p>
-      <label htmlFor="proof-json">Proof bundle JSON</label>
+      <div className="proof-tools">
+        <label htmlFor="proof-json">Proof bundle / JSON</label>
+        <input
+          className="file-input"
+          type="file"
+          accept=".json,application/json"
+          aria-label="Open a proof JSON file locally"
+          onChange={(e) => {
+            void openFile(e.target.files?.[0]);
+            e.target.value = "";
+          }}
+        />
+      </div>
       <textarea
         id="proof-json"
         className="proof-input mono"
@@ -45,11 +71,13 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
         onChange={(e) => {
           setText(e.target.value);
           setResult(null);
+          setError("");
         }}
         spellCheck={false}
+        placeholder={'{\n  "gap": { ... },\n  "plan": { ... },\n  "receipt": { ... }\n}'}
       />
       <div className="cta-row">
-        <button className="btn primary" onClick={check}>
+        <button className="btn primary" onClick={check} disabled={!text.trim()}>
           Verify in browser
         </button>
         <button className="btn" onClick={download} disabled={!text}>
@@ -59,17 +87,19 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
       <div aria-live="polite">
         {error && <p role="alert">{error}</p>}
         {result && (
-          <div className="panel">
+          <div className="panel proof-result">
             <h4>
               {result.valid
                 ? "Integrity checks passed"
                 : "Integrity checks failed — do not consume"}
             </h4>
-            {Object.entries(result.checks).map(([name, pass]) => (
-              <p key={name}>
-                {pass ? "✓" : "×"} {name}
-              </p>
-            ))}
+            <div className="check-grid">
+              {Object.entries(result.checks).map(([name, pass]) => (
+                <p key={name}>
+                  {pass ? "✓" : "×"} {name}
+                </p>
+              ))}
+            </div>
           </div>
         )}
       </div>

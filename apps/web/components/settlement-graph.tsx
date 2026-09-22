@@ -27,7 +27,7 @@ export function SettlementGraph({ plan }: { plan: SettlementPlan }) {
   const H = Math.max(90, 40 + rows.length * rowH);
   const cy = H / 2;
   const color = (k: string) =>
-    k === "fee" ? "#d9a441" : k === "refund" ? "#8b939e" : "#3fb96d";
+    k === "fee" ? "var(--warn)" : k === "refund" ? "var(--muted)" : "var(--ok)";
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="settlement graph">
@@ -37,15 +37,15 @@ export function SettlementGraph({ plan }: { plan: SettlementPlan }) {
         width={130}
         height={52}
         rx={8}
-        fill="#161a20"
-        stroke="#4f8ef7"
+        fill="var(--panel-2)"
+        stroke="var(--accent)"
         strokeWidth={1.5}
       />
       <text
         x={85}
         y={cy - 4}
         textAnchor="middle"
-        fill="#e6e9ed"
+        fill="var(--text)"
         fontSize={10}
         fontFamily="monospace"
       >
@@ -55,7 +55,7 @@ export function SettlementGraph({ plan }: { plan: SettlementPlan }) {
         x={85}
         y={cy + 12}
         textAnchor="middle"
-        fill="#4f8ef7"
+        fill="var(--accent)"
         fontSize={11}
         fontFamily="monospace"
       >
@@ -82,7 +82,13 @@ export function SettlementGraph({ plan }: { plan: SettlementPlan }) {
               fill={color(r.kind)}
               opacity={0.25}
             />
-            <text x={410} y={y + 16} fill="#8b939e" fontSize={8} fontFamily="monospace">
+            <text
+              x={410}
+              y={y + 16}
+              fill="var(--muted)"
+              fontSize={8}
+              fontFamily="monospace"
+            >
               {r.label} · {r.to.slice(0, 10)}…
             </text>
             <text

@@ -4,10 +4,26 @@ import { API_BASE, fmtUsdc, short, type Receipt } from "../../lib/api";
 export const dynamic = "force-dynamic";
 
 export default async function ReceiptsPage() {
-  const res = await fetch(`${API_BASE}/api/receipts`, { cache: "no-store" });
-  const receipts: Receipt[] = res.ok ? (await res.json()).receipts : [];
+  const res = await fetch(`${API_BASE}/api/receipts`, {
+    cache: "no-store",
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error("Receipt archive unavailable");
+  const receipts: Receipt[] = (await res.json()).receipts;
   return (
-    <main className="container">
+    <main id="main" className="container">
+      <section className="hero">
+        <div className="tagline">The record / Evidence receipts</div>
+        <h1>
+          Every decision
+          <br />
+          leaves a paper trail.
+        </h1>
+        <p className="sub">
+          Inspect accepted evidence, supplier payouts, and settlement records. Each
+          receipt connects a question to the evidence that answered it.
+        </p>
+      </section>
       <section className="block">
         <h3>Evidence receipts</h3>
         <table className="market">
@@ -39,7 +55,21 @@ export default async function ReceiptsPage() {
           </tbody>
         </table>
         {receipts.length === 0 ? (
-          <p className="muted">No receipts yet — settle a gap first.</p>
+          <div className="empty-market">
+            <div className="empty-glyph" aria-hidden="true">
+              [ ↳ ]
+            </div>
+            <div>
+              <h3>The archive starts with a settlement.</h3>
+              <p>
+                No receipts have been issued in this environment. Run a simulated bounty
+                to inspect an example, or open a proof you already have.
+              </p>
+            </div>
+            <Link className="btn" href="/verify">
+              Open a proof ↗
+            </Link>
+          </div>
         ) : null}
       </section>
     </main>

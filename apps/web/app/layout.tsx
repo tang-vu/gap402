@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { EnvBanner } from "../components/env-banner";
+import { SiteNav } from "../components/site-nav";
 
 export const metadata: Metadata = {
   title: "Gap402 — The missing-knowledge market for AI agents",
@@ -12,29 +13,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <EnvBanner />
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
         <header className="site">
           <div className="container row">
-            <h1>
-              <a href="/" style={{ color: "inherit" }}>
-                gap402
-              </a>
-            </h1>
-            <nav>
-              <a href="/">market</a>
-              <a href="/gaps">gaps</a>
-              <a href="/receipts">receipts</a>
-              <a href="/lab">evidence lab</a>
-              <a href="/verify">verify proof</a>
-              <a href="https://github.com/tang-vu/gap402">github</a>
-            </nav>
+            <a href="/" className="wordmark" aria-label="Gap402 home">
+              <span className="brand-mark" aria-hidden="true">
+                g<span>↗</span>
+              </span>
+              gap<span>402</span>
+            </a>
+            <SiteNav />
           </div>
         </header>
+        <EnvBanner />
         {children}
         <footer className="site">
           <div className="container">
-            gap402 — turn uncertainty into a market · evidence bounties in USDC on Arc ·
-            MIT
+            <div className="footer-top">
+              <a href="/" className="footer-brand">
+                gap402<span>↗</span>
+              </a>
+              <p>
+                Questions create markets.
+                <br />
+                Evidence moves them forward.
+              </p>
+            </div>
+            <div className="footer-bottom">
+              <span>Evidence bounties · USDC on Arc</span>
+              <a href="https://github.com/tang-vu/gap402">Open source / MIT ↗</a>
+              <span>Built for the unknown.</span>
+            </div>
           </div>
         </footer>
       </body>

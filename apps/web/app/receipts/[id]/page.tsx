@@ -30,7 +30,7 @@ export default async function ReceiptPage({
   }
 
   return (
-    <main className="container">
+    <main id="main" className="container">
       <section className="block">
         <h3>Evidence receipt · {receipt.id}</h3>
         <p className="notice">

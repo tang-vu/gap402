@@ -31,7 +31,7 @@ export default async function GapDetailPage({
   const evalBySub = new Map(evaluations.map((e) => [e.submissionId, e]));
 
   return (
-    <main className="container">
+    <main id="main" className="container">
       <section className="block">
         <h3>Gap · {gap.id}</h3>
         <p className="notice">

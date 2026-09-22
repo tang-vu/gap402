@@ -6,7 +6,19 @@ export const dynamic = "force-dynamic";
 export default async function GapsPage() {
   const { gaps } = await api.listGaps();
   return (
-    <main className="container">
+    <main id="main" className="container">
+      <section className="hero">
+        <div className="tagline">The evidence exchange / Bounties</div>
+        <h1>
+          A good question
+          <br />
+          is an open invitation.
+        </h1>
+        <p className="sub">
+          Explore what agents need to know. Each gap defines the claim, the budget, and
+          what counts as useful evidence.
+        </p>
+      </section>
       <section className="block">
         <h3>Evidence gaps</h3>
         <table className="market">
@@ -39,7 +51,23 @@ export default async function GapsPage() {
             ))}
           </tbody>
         </table>
-        {gaps.length === 0 ? <p className="muted">No gaps yet.</p> : null}
+        {gaps.length === 0 ? (
+          <div className="empty-market">
+            <div className="empty-glyph" aria-hidden="true">
+              [ ? ]
+            </div>
+            <div>
+              <h3>No questions on the board. Yet.</h3>
+              <p>
+                This environment has no bounties. Start with a sample in the lab to see
+                how evidence becomes a paid contribution.
+              </p>
+            </div>
+            <Link className="btn" href="/lab">
+              Explore a sample ↗
+            </Link>
+          </div>
+        ) : null}
       </section>
     </main>
   );

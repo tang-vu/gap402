@@ -2,12 +2,14 @@ import { EvidenceLab } from "../../components/evidence-lab";
 
 export default function LabPage() {
   return (
-    <main className="container">
+    <main id="main" className="container">
       <section className="hero">
-        <div className="tagline">
-          From an unsupported claim to an inspectable decision
-        </div>
-        <h2>Follow the evidence. Follow the money.</h2>
+        <div className="tagline">The evidence lab / An interactive field test</div>
+        <h1>
+          Follow the evidence.
+          <br />
+          Follow the money.
+        </h1>
         <p className="sub">
           Run a 0.05 USDC bounty through the real verification and settlement engine.
           Inspect what earns a reward, what gets rejected, and when the agent must stop.
