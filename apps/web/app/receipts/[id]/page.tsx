@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { api, ApiError, fmtUsdc, short } from "../../../lib/api";
+import { api, ApiError, fmtUsdc } from "../../../lib/api";
 import { ProofInspector } from "../../../components/proof-inspector";
-
+import { CopyField } from "../../../components/copy-field";
+import { ReceiptEntries } from "../../../components/receipt-entries";
 export const dynamic = "force-dynamic";
-
 export default async function ReceiptPage({
   params,
 }: {
@@ -18,124 +18,136 @@ export default async function ReceiptPage({
     if (e instanceof ApiError && e.status === 404) notFound();
     throw e;
   }
-  const paidSum = receipt.acceptedEvidence.reduce(
-    (s, e) => s + BigInt(e.payoutUnits),
+  const suppliers = receipt.acceptedEvidence.reduce(
+    (sum, e) => sum + BigInt(e.payoutUnits),
     0n,
   );
   let bundle: unknown;
   try {
     bundle = await api.proof(receipt.bountyId);
-  } catch {
-    /* old receipt may have no stored plan */
-  }
-
+  } catch {}
+  const explorer =
+    receipt.network === "mainnet"
+      ? "https://explorer.arc.io"
+      : receipt.network === "testnet"
+        ? "https://explorer.testnet.arc.io"
+        : null;
   return (
     <main id="main" className="container">
-      <section className="block">
-        <h3>Evidence receipt · {receipt.id}</h3>
-        <p className="notice">
-          {receipt.settlementTx
-            ? "Settlement transaction recorded; verify its registry anchor independently."
-            : "OFFCHAIN SIMULATION — no settlement transaction recorded."}{" "}
-          Evidence metadata is supplier-declared. Verification is a judgment, not proof of
-          truth.
-        </p>
-        <div className="panel">
-          <dl className="kv">
-            <dt>claim</dt>
-            <dd>{receipt.targetClaim}</dd>
-            <dt>bounty</dt>
-            <dd className="mono">
-              <Link href={`/gaps/${receipt.bountyId}`}>{receipt.bountyId}</Link>
-            </dd>
-            <dt>receipt hash</dt>
-            <dd className="mono">{receipt.receiptHash}</dd>
-            <dt>settlement hash</dt>
-            <dd className="mono">{receipt.settlementHash}</dd>
-            <dt>request hash</dt>
-            <dd className="mono">{receipt.requestHash}</dd>
-            <dt>network</dt>
-            <dd className="mono">
-              {receipt.network} · chain {receipt.chainId}
-            </dd>
-            <dt>contract</dt>
-            <dd className="mono">{receipt.bountyContract}</dd>
-            <dt>settlement tx</dt>
-            <dd className="mono">{receipt.settlementTx ?? "—"}</dd>
-            <dt>total paid</dt>
-            <dd className="mono">
-              {fmtUsdc(receipt.totalPaidUnits)} USDC (evidence {fmtUsdc(paidSum)}, fee{" "}
-              {fmtUsdc(receipt.verifierFeeUnits)}, refund {fmtUsdc(receipt.refundUnits)})
-            </dd>
-            <dt>evaluator</dt>
-            <dd className="mono">{receipt.evaluatorVersion}</dd>
-            <dt>created</dt>
-            <dd className="mono">{receipt.createdAt}</dd>
-          </dl>
+      <div className="receipt-toolbar">
+        <Link className="text-link" href="/receipts">
+          ← Receipt archive
+        </Link>
+        <Link className="btn" href={`/gaps/${receipt.bountyId}`}>
+          Return to bounty ↗
+        </Link>
+        {Boolean(bundle) && (
+          <a className="btn primary" href="#portable-proof">
+            Export / inspect proof ↓
+          </a>
+        )}
+      </div>
+      <article className="receipt-document">
+        <header className="receipt-document-header">
+          <div>
+            <p className="eyebrow">Gap402 / The evidence exchange</p>
+            <h1>
+              Evidence Receipt<span aria-hidden="true">↳</span>
+            </h1>
+          </div>
+          <p className="mono">
+            {receipt.network.toUpperCase()}
+            <br />
+            CHAIN {receipt.chainId}
+            <br />
+            {receipt.createdAt}
+          </p>
+        </header>
+        <div className="receipt-claim">
+          <p className="eyebrow">The recorded claim</p>
+          <h2>{receipt.targetClaim}</h2>
+          <p className="runtime-note">
+            {receipt.settlementTx
+              ? "Settlement transaction recorded; independently inspect the registry anchor."
+              : "No settlement transaction recorded. This receipt does not establish an onchain anchor."}
+          </p>
         </div>
-      </section>
-
-      <section className="block">
-        <h3>Accepted evidence · {receipt.acceptedEvidence.length}</h3>
-        <table className="market">
-          <thead>
-            <tr>
-              <th>url</th>
-              <th>supplier</th>
-              <th>support</th>
-              <th>payout</th>
-              <th>content hash</th>
-            </tr>
-          </thead>
-          <tbody>
-            {receipt.acceptedEvidence.map((e) => (
-              <tr key={e.submissionId}>
-                <td>
-                  <a href={e.url} target="_blank" rel="noreferrer">
-                    {e.url}
-                  </a>
-                </td>
-                <td className="mono">{short(e.supplierAddress, 6)}</td>
-                <td className="mono">{(e.scores.support / 10000).toFixed(0)}%</td>
-                <td className="mono">{fmtUsdc(e.payoutUnits)} USDC</td>
-                <td className="mono muted">{short(e.contentHash, 8)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-
-      {receipt.rejectedEvidence.length > 0 ? (
-        <section className="block">
-          <h3>Rejected · {receipt.rejectedEvidence.length}</h3>
-          <table className="market">
-            <tbody>
-              {receipt.rejectedEvidence.map((e) => (
-                <tr key={e.submissionId}>
-                  <td className="muted">{e.url}</td>
-                  <td className="muted" style={{ fontSize: 12 }}>
-                    {e.reasons.join("; ")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <section className="receipt-accounting" aria-label="Receipt accounting">
+          <div>
+            <span>Supplier allocations</span>
+            <strong>{fmtUsdc(suppliers)}</strong>
+          </div>
+          <div>
+            <span>Verifier fee</span>
+            <strong>{fmtUsdc(receipt.verifierFeeUnits)}</strong>
+          </div>
+          <div>
+            <span>Requester refund</span>
+            <strong>{fmtUsdc(receipt.refundUnits)}</strong>
+          </div>
+          <div className="accounting-sum">
+            <span>Total accounted / USDC</span>
+            <strong>
+              {fmtUsdc(BigInt(receipt.totalPaidUnits) + BigInt(receipt.refundUnits))}
+            </strong>
+          </div>
         </section>
-      ) : null}
-
-      <section className="block">
-        <h3>Raw receipt</h3>
-        <pre className="json">{JSON.stringify(receipt, null, 2)}</pre>
-        <p className="muted" style={{ fontSize: 12 }}>
-          Verify independently:{" "}
-          <span className="mono">gap402 receipt verify {receipt.id}</span>
+        <p className="muted">
+          Total paid includes the verifier fee once. Refund is separate. These recorded
+          amounts do not themselves prove that funds moved.
         </p>
-      </section>
-      {bundle ? (
-        <ProofInspector initialBundle={bundle} />
-      ) : (
-        <p className="muted">Full proof bundle unavailable for this receipt.</p>
-      )}
+        <ReceiptEntries receipt={receipt} />
+        <section className="receipt-identifiers">
+          <h2>Portable by design.</h2>
+          <p>
+            The request, allocation and receipt each have a canonical hash. Compare them
+            with the original records and the registry on the stated network.
+          </p>
+          <CopyField label="receipt identifier" value={receipt.id} />
+          <CopyField label="receipt hash" value={receipt.receiptHash} />
+          <CopyField label="settlement hash" value={receipt.settlementHash} />
+          <CopyField label="request hash" value={receipt.requestHash} />
+          <CopyField label="contract" value={receipt.bountyContract} />
+          {receipt.settlementTx && (
+            <>
+              <CopyField label="settlement transaction" value={receipt.settlementTx} />
+              {explorer && (
+                <a
+                  className="text-link"
+                  href={`${explorer}/tx/${receipt.settlementTx}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Inspect recorded transaction ↗
+                </a>
+              )}
+            </>
+          )}
+          <p>
+            Evaluator: <span className="mono">{receipt.evaluatorVersion}</span>
+          </p>
+          <details>
+            <summary>Advanced / original receipt JSON</summary>
+            <pre className="json">{JSON.stringify(receipt, null, 2)}</pre>
+          </details>
+        </section>
+      </article>
+      <div id="portable-proof">
+        {bundle ? (
+          <ProofInspector initialBundle={bundle} />
+        ) : (
+          <div className="refusal">
+            <h3>Full proof bundle unavailable.</h3>
+            <p>
+              The stored plan could not be retrieved. The receipt above remains readable;
+              local bundle verification requires the original gap, plan and receipt.
+            </p>
+            <Link href="/verify" className="btn">
+              Open your own proof
+            </Link>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

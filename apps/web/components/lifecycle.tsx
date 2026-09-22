@@ -13,11 +13,12 @@ export function Lifecycle({ status }: { status: string }) {
   const current = ORDER.indexOf(status as (typeof ORDER)[number]);
   const dead = status === "cancelled" || status === "expired";
   return (
-    <div className="timeline">
+    <div className="timeline" aria-label={`Recorded lifecycle: ${status}`}>
       {ORDER.map((s, i) => (
         <span
           key={s}
-          className={`step ${dead ? "" : i < current ? "done" : i === current ? "now" : ""}`}
+          className={`step ${dead ? "" : i === current ? "now" : ""}`}
+          aria-current={i === current ? "step" : undefined}
         >
           {s}
         </span>

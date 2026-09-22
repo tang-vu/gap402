@@ -1,7 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { verifyBundle } from "@gap402/protocol";
+
+const checkDescriptions: Record<string, string> = {
+  schema: "The gap, plan and receipt match the required protocol schemas.",
+  receiptHash: "The canonical receipt content matches its recorded hash.",
+  uniqueEvidence: "No submission identifier appears twice in the receipt.",
+  accounting:
+    "Accepted evidence allocations plus the verifier fee equal the receipt’s total paid.",
+  requestHash: "The original bounty specification matches the receipt’s request hash.",
+  settlementHash: "The canonical plan matches both recorded settlement hashes.",
+  binding: "The bounty identifiers and target claims agree across all three records.",
+  budget:
+    "Payouts plus refund equal the bounty; distributable budget plus fee also reconcile.",
+  totals: "The payout sum, total paid, refund and fee agree between plan and receipt.",
+  fees: "Fee rows sum to the recorded fee and use the declared verifier address.",
+  payouts:
+    "Supplier identifiers, recipients and exact amounts agree between plan and accepted evidence.",
+};
 
 export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
   const [text, setText] = useState(
@@ -9,8 +26,10 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
   );
   const [result, setResult] = useState<ReturnType<typeof verifyBundle> | null>(null);
   const [error, setError] = useState("");
+  const revision = useRef(0);
   async function openFile(file: File | undefined) {
     if (!file) return;
+    const current = ++revision.current;
     setResult(null);
     setError("");
     if (file.size > 1000000) {
@@ -18,14 +37,28 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
       return;
     }
     try {
-      setText(await file.text());
+      const content = await file.text();
+      if (current !== revision.current) return;
+      setText(content);
+      try {
+        JSON.parse(content);
+      } catch {
+        setError(
+          "This file contains malformed JSON. Correct it below, or choose another proof.",
+        );
+      }
     } catch {
-      setError("This file could not be read. Try pasting its JSON below.");
+      if (current === revision.current)
+        setError("This file could not be read. Try pasting its JSON below.");
     }
   }
   function check() {
     setError("");
     setResult(null);
+    if (new TextEncoder().encode(text).length > 1000000) {
+      setError("Choose a JSON proof smaller than 1 MB.");
+      return;
+    }
     try {
       setResult(verifyBundle(JSON.parse(text)));
     } catch {
@@ -43,8 +76,16 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
     URL.revokeObjectURL(url);
   }
   return (
-    <section className="block">
-      <h3>Inspect a portable proof</h3>
+    <section className="block proof-desk">
+      <div className="proof-desk-heading">
+        <div>
+          <p className="eyebrow">Local processing / 1 MB maximum</p>
+          <h2>Inspect a portable proof.</h2>
+        </div>
+        <span className="proof-mark" aria-hidden="true">
+          [ ↳ ]
+        </span>
+      </div>
       <p>
         Checks run in your browser, without uploading the bundle. Verify the
         specification, payout recipients, exact budget and receipt hash. Try changing a
@@ -69,6 +110,7 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
         value={text}
         maxLength={1000000}
         onChange={(e) => {
+          revision.current++;
           setText(e.target.value);
           setResult(null);
           setError("");
@@ -95,9 +137,13 @@ export function ProofInspector({ initialBundle }: { initialBundle?: unknown }) {
             </h4>
             <div className="check-grid">
               {Object.entries(result.checks).map(([name, pass]) => (
-                <p key={name}>
-                  {pass ? "✓" : "×"} {name}
-                </p>
+                <div className="proof-check" key={name}>
+                  <span className={pass ? "check-pass" : "check-fail"}>
+                    {pass ? "Pass" : "Fail"}
+                  </span>
+                  <strong>{name}</strong>
+                  <p>{checkDescriptions[name] ?? "Protocol check."}</p>
+                </div>
               ))}
             </div>
           </div>

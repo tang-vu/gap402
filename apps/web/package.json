@@ -7,8 +7,8 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@gap402/protocol": "workspace:*",

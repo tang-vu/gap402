@@ -1,8 +1,6 @@
-import Link from "next/link";
-import { API_BASE, fmtUsdc, short, type Receipt } from "../../lib/api";
-
+﻿import Link from "next/link";
+import { API_BASE, fmtUsdc, type Receipt } from "../../lib/api";
 export const dynamic = "force-dynamic";
-
 export default async function ReceiptsPage() {
   const res = await fetch(`${API_BASE}/api/receipts`, {
     cache: "no-store",
@@ -13,65 +11,72 @@ export default async function ReceiptsPage() {
   return (
     <main id="main" className="container">
       <section className="hero">
-        <div className="tagline">The record / Evidence receipts</div>
+        <div className="tagline">The record / Receipt archive</div>
         <h1>
-          Every decision
+          Decisions leave
           <br />
-          leaves a paper trail.
+          <em>a paper trail.</em>
         </h1>
         <p className="sub">
-          Inspect accepted evidence, supplier payouts, and settlement records. Each
-          receipt connects a question to the evidence that answered it.
+          A portable record of the claim, its evidence and the allocation. Open a receipt
+          to trace the decision or export its proof.
         </p>
+        <Link className="text-link" href="/verify">
+          Already have a proof? Inspect it locally ↗
+        </Link>
       </section>
-      <section className="block">
-        <h3>Evidence receipts</h3>
-        <table className="market">
-          <thead>
-            <tr>
-              <th>receipt</th>
-              <th>claim</th>
-              <th>accepted</th>
-              <th>paid</th>
-              <th>hash</th>
-              <th>network</th>
-            </tr>
-          </thead>
-          <tbody>
-            {receipts.map((r) => (
-              <tr key={r.id}>
-                <td>
-                  <Link href={`/receipts/${r.id}`} className="mono">
-                    {short(r.id, 8)}
-                  </Link>
-                </td>
-                <td>{r.targetClaim}</td>
-                <td className="mono">{r.acceptedEvidence.length}</td>
-                <td className="mono">{fmtUsdc(r.totalPaidUnits)} USDC</td>
-                <td className="mono muted">{short(r.receiptHash, 10)}</td>
-                <td className="mono muted">{r.network}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {receipts.length === 0 ? (
-          <div className="empty-market">
-            <div className="empty-glyph" aria-hidden="true">
-              [ ↳ ]
+      <section className="receipt-archive" aria-label="Evidence receipts">
+        {receipts.map((r, i) => (
+          <article className="archive-document" key={r.id}>
+            <div className="paper-header">
+              <span>EVIDENCE RECEIPT</span>
+              <span>{String(i + 1).padStart(3, "0")}</span>
             </div>
-            <div>
-              <h3>The archive starts with a settlement.</h3>
-              <p>
-                No receipts have been issued in this environment. Run a simulated bounty
-                to inspect an example, or open a proof you already have.
-              </p>
-            </div>
-            <Link className="btn" href="/verify">
-              Open a proof ↗
+            <Link href={`/receipts/${r.id}`}>
+              <h2>
+                {r.targetClaim} <span aria-hidden="true">↗</span>
+              </h2>
             </Link>
-          </div>
-        ) : null}
+            <p>
+              {r.acceptedEvidence.length} accepted sources · {r.rejectedEvidence.length}{" "}
+              rejected
+            </p>
+            <div className="archive-amount">
+              <span>Total paid / includes verifier fee</span>
+              <strong>
+                {fmtUsdc(r.totalPaidUnits)} <small>USDC</small>
+              </strong>
+            </div>
+            <p className="mono">
+              {r.network} ·{" "}
+              {r.settlementTx
+                ? "Settlement transaction recorded"
+                : "No settlement transaction recorded"}
+            </p>
+            <code>{r.receiptHash}</code>
+            <Link className="text-link" href={`/receipts/${r.id}`}>
+              Open receipt →
+            </Link>
+          </article>
+        ))}
       </section>
+      {!receipts.length && (
+        <div className="empty-market">
+          <span className="empty-glyph" aria-hidden="true">
+            [ ↳ ]
+          </span>
+          <div>
+            <h3>The archive starts with a settlement.</h3>
+            <p>
+              No receipts in this environment. Run a simulated bounty in the lab, or
+              inspect a proof you already have.
+            </p>
+          </div>
+          <Link className="btn" href="/lab">
+            Explore the lab ↗
+          </Link>
+        </div>
+      )}
     </main>
   );
 }
