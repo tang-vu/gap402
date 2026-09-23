@@ -31,7 +31,15 @@ export function SourceJourney({
   const evaluation = evaluations.find((e) => e.submissionId === selected);
   const payout = plan?.payouts.find((p) => p.submissionId === selected);
   return (
-    <div className="source-journey" role="group" aria-label="Source trace diagram">
+    <div
+      className={`source-journey journey-${plan ? (evaluation?.verdict === "accepted" ? "accepted" : "rejected") : "blocked"}`}
+      role="group"
+      aria-label="Source trace diagram"
+    >
+      <div className="journey-meta mono">
+        <span>RETURNED RESULT / SOURCE {String(index + 1).padStart(2, "0")}</span>
+        <span>{source?.id ?? "No source selected"}</span>
+      </div>
       <div className="journey-sources">
         {submissions.map((s, i) => (
           <button
@@ -111,6 +119,11 @@ export function SourceJourney({
           </small>
         </div>
       </div>
+      <p className="journey-outcome mono">
+        {plan
+          ? `${evaluation?.verdict ?? "Unevaluated"} / ${fmtUsdc(payout?.amountUnits ?? "0")} USDC to ${payout?.recipient ?? "no direct recipient"} / ${receipt ? "receipt entry recorded" : "receipt unavailable"}`
+          : "Requirement unmet / no payout plan / no receipt issued"}
+      </p>
     </div>
   );
 }

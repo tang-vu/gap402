@@ -1,6 +1,7 @@
 ﻿"use client";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { gsap } from "gsap";
 import {
   fmtUsdc,
   type Gap,
@@ -64,6 +65,9 @@ export function EvidenceLab() {
   const [error, setError] = useState("");
   const [chapter, setChapter] = useState(0);
   const [selected, setSelected] = useState("");
+  const [motionTime, setMotionTime] = useState(0);
+  const [motionPlaying, setMotionPlaying] = useState(false);
+  const motion = useRef<gsap.core.Timeline | null>(null);
   const cache = useRef<Partial<Record<Scenario, Run>>>({});
   const request = useRef<AbortController | null>(null);
   const generation = useRef(0);
@@ -74,10 +78,84 @@ export function EvidenceLab() {
     },
     [],
   );
+  useEffect(() => {
+    if (!run) return;
+    const root = document.querySelector(".lab-replay");
+    if (!root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const context = gsap.context(() => {
+      const source = root.querySelector('.journey-sources button[aria-pressed="true"]');
+      const trace = root.querySelector(".journey-trace");
+      const connector = root.querySelector(".journey-connector");
+      const stages = root.querySelectorAll(".journey-trace > div");
+      const arrows = root.querySelectorAll(".journey-arrow");
+      const tl = gsap.timeline({
+        paused: true,
+        onUpdate: () => {
+          const time = tl.time();
+          setMotionTime(time);
+          const next = time < 2 ? 0 : time < 4 ? 1 : time < 6.5 ? 2 : time < 8.3 ? 3 : 4;
+          setChapter((current) => (current === next ? current : next));
+        },
+        onComplete: () => setMotionPlaying(false),
+      });
+      tl.fromTo(
+        source,
+        { y: -30, rotation: -8, scale: 0.85, boxShadow: "0 2px 2px #272c2510" },
+        {
+          y: 0,
+          rotation: -2,
+          scale: 1,
+          boxShadow: "0 14px 20px #272c2538",
+          duration: 2,
+          ease: "power3.out",
+        },
+        0,
+      )
+        .fromTo(
+          connector,
+          { scaleY: 0, opacity: 0 },
+          { scaleY: 1, opacity: 1, duration: 1.3 },
+          1.7,
+        )
+        .fromTo(
+          trace,
+          { clipPath: "inset(0 100% 0 0)" },
+          { clipPath: "inset(0 0% 0 0)", duration: 2.2 },
+          2.1,
+        )
+        .fromTo(stages[1]!, { y: 30 }, { y: 0, duration: 1.4 }, 4)
+        .fromTo(
+          arrows,
+          { scaleX: 0, opacity: 0 },
+          { scaleX: 1, opacity: 1, stagger: 0.35, duration: 1.1 },
+          5.6,
+        )
+        .fromTo(stages[2]!, { y: 30 }, { y: 0, duration: 1.4 }, 6.5)
+        .to(source, { y: 0, rotation: 0, scale: 1.04, duration: 1 }, 8.3);
+      tl.duration(10);
+      if (!run.plan) tl.addPause(6.5, () => setMotionPlaying(false));
+      motion.current = tl;
+      tl.play(0);
+      setMotionPlaying(true);
+    }, root);
+    return () => {
+      motion.current = null;
+      context.revert();
+    };
+  }, [run, selected]);
+  function seekChapter(index: number) {
+    motion.current?.pause([0, 2, 4, 6.5, 8.3][index] ?? 0);
+    setMotionPlaying(false);
+    setChapter(index);
+  }
+  function selectSource(id: string) {
+    setSelected(id);
+  }
   function install(value: Run | null) {
     setRun(value);
     setChapter(0);
     setSelected(value?.submissions[0]?.id ?? "");
+    setMotionTime(0);
   }
   function change(value: Scenario) {
     generation.current++;
@@ -90,6 +168,8 @@ export function EvidenceLab() {
   async function start() {
     if (cache.current[scenario]) {
       install(cache.current[scenario]!);
+      motion.current?.restart();
+      setMotionPlaying(true);
       return;
     }
     const token = ++generation.current;
@@ -251,13 +331,53 @@ export function EvidenceLab() {
                   <button
                     key={label}
                     aria-current={chapter === i ? "step" : undefined}
-                    onClick={() => setChapter(i)}
+                    onClick={() => seekChapter(i)}
                   >
                     <span>0{i + 1}</span>
                     {label}
                   </button>
                 ))}
               </nav>
+              <div
+                className="motion-transport"
+                role="group"
+                aria-label="Completed result playback"
+              >
+                <button
+                  onClick={() => {
+                    if (motion.current?.paused()) {
+                      motion.current.play();
+                      setMotionPlaying(true);
+                    } else {
+                      motion.current?.pause();
+                      setMotionPlaying(false);
+                    }
+                  }}
+                >
+                  {motionPlaying ? "Pause playback" : "Play playback"}
+                </button>
+                <button
+                  onClick={() => {
+                    motion.current?.restart();
+                    setMotionPlaying(true);
+                  }}
+                >
+                  Replay from start
+                </button>
+                <input
+                  aria-label="Seek completed result"
+                  type="range"
+                  min="0"
+                  max="10"
+                  step="0.01"
+                  value={motionTime}
+                  onChange={(event) => {
+                    motion.current?.pause(Number(event.target.value));
+                    setMotionPlaying(false);
+                  }}
+                />
+                <span className="mono">{motionTime.toFixed(1)} / 10.0 s</span>
+              </div>
               <div className="replay-chapter" aria-live="polite">
                 <p className="eyebrow">Completed result / Chapter 0{chapter + 1}</p>
                 <h2>
@@ -312,7 +432,7 @@ export function EvidenceLab() {
                       budget={run.gap.budgetUnits}
                       submissions={run.submissions}
                       selected={selected}
-                      onSelect={setSelected}
+                      onSelect={selectSource}
                     />
                   ) : (
                     <div className="refusal">
@@ -358,14 +478,14 @@ export function EvidenceLab() {
                   plan={run.plan}
                   receipt={run.receipt}
                   selected={selected}
-                  onSelect={setSelected}
+                  onSelect={selectSource}
                   chapter={chapter}
                 />
                 <div className="chapter-actions">
                   <button
                     className="btn"
                     disabled={chapter === 0}
-                    onClick={() => setChapter((c) => c - 1)}
+                    onClick={() => seekChapter(chapter - 1)}
                   >
                     ← Previous
                   </button>
@@ -373,7 +493,7 @@ export function EvidenceLab() {
                   <button
                     className="btn"
                     disabled={chapter === 4}
-                    onClick={() => setChapter((c) => c + 1)}
+                    onClick={() => seekChapter(chapter + 1)}
                   >
                     Next chapter →
                   </button>
@@ -385,7 +505,7 @@ export function EvidenceLab() {
                 plan={run.plan}
                 receipt={run.receipt}
                 selected={selected}
-                onSelect={setSelected}
+                onSelect={selectSource}
                 showAllocation={false}
               />
               {run.duplicatePrevented && (

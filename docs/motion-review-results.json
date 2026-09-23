@@ -1,0 +1,741 @@
+{
+  "checks": [
+    {
+      "name": "home: 320px no overflow",
+      "passed": true
+    },
+    {
+      "name": "home: 320px environment visible",
+      "passed": true
+    },
+    {
+      "name": "lab: 320px no overflow",
+      "passed": true
+    },
+    {
+      "name": "lab: 320px environment visible",
+      "passed": true
+    },
+    {
+      "name": "market: 320px no overflow",
+      "passed": true
+    },
+    {
+      "name": "market: 320px environment visible",
+      "passed": true
+    },
+    {
+      "name": "gap: 320px no overflow",
+      "passed": true
+    },
+    {
+      "name": "gap: 320px environment visible",
+      "passed": true
+    },
+    {
+      "name": "archive: 320px no overflow",
+      "passed": true
+    },
+    {
+      "name": "archive: 320px environment visible",
+      "passed": true
+    },
+    {
+      "name": "receipt: 320px no overflow",
+      "passed": true
+    },
+    {
+      "name": "receipt: 320px environment visible",
+      "passed": true
+    },
+    {
+      "name": "verify: 320px no overflow",
+      "passed": true
+    },
+    {
+      "name": "verify: 320px environment visible",
+      "passed": true
+    },
+    {
+      "name": "home: 390px no overflow",
+      "passed": true
+    },
+    {
+      "name": "home: 390px environment visible",
+      "passed": true
+    },
+    {
+      "name": "lab: 390px no overflow",
+      "passed": true
+    },
+    {
+      "name": "lab: 390px environment visible",
+      "passed": true
+    },
+    {
+      "name": "market: 390px no overflow",
+      "passed": true
+    },
+    {
+      "name": "market: 390px environment visible",
+      "passed": true
+    },
+    {
+      "name": "gap: 390px no overflow",
+      "passed": true
+    },
+    {
+      "name": "gap: 390px environment visible",
+      "passed": true
+    },
+    {
+      "name": "archive: 390px no overflow",
+      "passed": true
+    },
+    {
+      "name": "archive: 390px environment visible",
+      "passed": true
+    },
+    {
+      "name": "receipt: 390px no overflow",
+      "passed": true
+    },
+    {
+      "name": "receipt: 390px environment visible",
+      "passed": true
+    },
+    {
+      "name": "verify: 390px no overflow",
+      "passed": true
+    },
+    {
+      "name": "verify: 390px environment visible",
+      "passed": true
+    },
+    {
+      "name": "home: 768px no overflow",
+      "passed": true
+    },
+    {
+      "name": "home: 768px environment visible",
+      "passed": true
+    },
+    {
+      "name": "lab: 768px no overflow",
+      "passed": true
+    },
+    {
+      "name": "lab: 768px environment visible",
+      "passed": true
+    },
+    {
+      "name": "market: 768px no overflow",
+      "passed": true
+    },
+    {
+      "name": "market: 768px environment visible",
+      "passed": true
+    },
+    {
+      "name": "gap: 768px no overflow",
+      "passed": true
+    },
+    {
+      "name": "gap: 768px environment visible",
+      "passed": true
+    },
+    {
+      "name": "archive: 768px no overflow",
+      "passed": true
+    },
+    {
+      "name": "archive: 768px environment visible",
+      "passed": true
+    },
+    {
+      "name": "receipt: 768px no overflow",
+      "passed": true
+    },
+    {
+      "name": "receipt: 768px environment visible",
+      "passed": true
+    },
+    {
+      "name": "verify: 768px no overflow",
+      "passed": true
+    },
+    {
+      "name": "verify: 768px environment visible",
+      "passed": true
+    },
+    {
+      "name": "home: 1440px no overflow",
+      "passed": true
+    },
+    {
+      "name": "home: 1440px environment visible",
+      "passed": true
+    },
+    {
+      "name": "lab: 1440px no overflow",
+      "passed": true
+    },
+    {
+      "name": "lab: 1440px environment visible",
+      "passed": true
+    },
+    {
+      "name": "market: 1440px no overflow",
+      "passed": true
+    },
+    {
+      "name": "market: 1440px environment visible",
+      "passed": true
+    },
+    {
+      "name": "gap: 1440px no overflow",
+      "passed": true
+    },
+    {
+      "name": "gap: 1440px environment visible",
+      "passed": true
+    },
+    {
+      "name": "archive: 1440px no overflow",
+      "passed": true
+    },
+    {
+      "name": "archive: 1440px environment visible",
+      "passed": true
+    },
+    {
+      "name": "receipt: 1440px no overflow",
+      "passed": true
+    },
+    {
+      "name": "receipt: 1440px environment visible",
+      "passed": true
+    },
+    {
+      "name": "verify: 1440px no overflow",
+      "passed": true
+    },
+    {
+      "name": "verify: 1440px environment visible",
+      "passed": true
+    },
+    {
+      "name": "hero pause control",
+      "passed": true
+    },
+    {
+      "name": "interrupted hero navigation",
+      "passed": true
+    },
+    {
+      "name": "story reverse changes geometry",
+      "passed": true
+    },
+    {
+      "name": "story resize during timeline",
+      "passed": true
+    },
+    {
+      "name": "mixed: seek sends no request",
+      "passed": true
+    },
+    {
+      "name": "mixed: all returned sources listed",
+      "passed": true
+    },
+    {
+      "name": "mixed: zero actual spend separate",
+      "passed": true
+    },
+    {
+      "name": "keyboard source selection",
+      "passed": true
+    },
+    {
+      "name": "diagram follows inspector selection",
+      "passed": true
+    },
+    {
+      "name": "diagram selection updates readable inspector",
+      "passed": true
+    },
+    {
+      "name": "keyboard chapter selection",
+      "passed": true
+    },
+    {
+      "name": "mixed: fee and refund counted once",
+      "passed": true
+    },
+    {
+      "name": "mixed: exact reconciliation",
+      "passed": true
+    },
+    {
+      "name": "mixed: actual amount 24532",
+      "passed": true
+    },
+    {
+      "name": "mixed: actual amount 22968",
+      "passed": true
+    },
+    {
+      "name": "mixed: actual amount 2500",
+      "passed": true
+    },
+    {
+      "name": "mixed: actual explanation available",
+      "passed": true
+    },
+    {
+      "name": "source persists into receipt chapter",
+      "passed": true
+    },
+    {
+      "name": "selected source receipt inclusion",
+      "passed": true
+    },
+    {
+      "name": "lab returned bundle passes offline checks",
+      "passed": true
+    },
+    {
+      "name": "populated lab: 320px",
+      "passed": true
+    },
+    {
+      "name": "populated lab: 390px",
+      "passed": true
+    },
+    {
+      "name": "populated lab: 768px",
+      "passed": true
+    },
+    {
+      "name": "rejected: seek sends no request",
+      "passed": true
+    },
+    {
+      "name": "rejected: all returned sources listed",
+      "passed": true
+    },
+    {
+      "name": "rejected: zero actual spend separate",
+      "passed": true
+    },
+    {
+      "name": "rejected: fee and refund counted once",
+      "passed": true
+    },
+    {
+      "name": "rejected: exact reconciliation",
+      "passed": true
+    },
+    {
+      "name": "rejected: actual amount 2500",
+      "passed": true
+    },
+    {
+      "name": "rejected: actual explanation available",
+      "passed": true
+    },
+    {
+      "name": "rejected: zero supplier amount",
+      "passed": true
+    },
+    {
+      "name": "insufficient: seek sends no request",
+      "passed": true
+    },
+    {
+      "name": "insufficient: all returned sources listed",
+      "passed": true
+    },
+    {
+      "name": "insufficient: zero actual spend separate",
+      "passed": true
+    },
+    {
+      "name": "insufficient: no fabricated allocation",
+      "passed": true
+    },
+    {
+      "name": "insufficient: returned refusal",
+      "passed": true
+    },
+    {
+      "name": "insufficient: no proof input",
+      "passed": true
+    },
+    {
+      "name": "insufficient: no receipt issued",
+      "passed": true
+    },
+    {
+      "name": "one request per scenario",
+      "passed": true
+    },
+    {
+      "name": "scenario cache restores result",
+      "passed": true
+    },
+    {
+      "name": "restart clears result",
+      "passed": true
+    },
+    {
+      "name": "replay and restart reuse completed data",
+      "passed": true
+    },
+    {
+      "name": "honest filtered empty state",
+      "passed": true
+    },
+    {
+      "name": "clear restores real records",
+      "passed": true
+    },
+    {
+      "name": "lifecycle filter",
+      "passed": true
+    },
+    {
+      "name": "stale rejection and zero payout visible",
+      "passed": true
+    },
+    {
+      "name": "full supplier and hash preserved",
+      "passed": true
+    },
+    {
+      "name": "no invented funding link",
+      "passed": true
+    },
+    {
+      "name": "receipt rejection inspection",
+      "passed": true
+    },
+    {
+      "name": "identifier copied exactly",
+      "passed": true
+    },
+    {
+      "name": "export includes original plan",
+      "passed": true
+    },
+    {
+      "name": "local proof checks do not send requests",
+      "passed": true
+    },
+    {
+      "name": "every check describes its exact scope",
+      "passed": true
+    },
+    {
+      "name": "edits invalidate stale verification",
+      "passed": true
+    },
+    {
+      "name": "tampered proof rejected",
+      "passed": true
+    },
+    {
+      "name": "invalid schema rejected",
+      "passed": true
+    },
+    {
+      "name": "malformed file feedback",
+      "passed": true
+    },
+    {
+      "name": "malformed paste feedback",
+      "passed": true
+    },
+    {
+      "name": "1 MB file limit",
+      "passed": true
+    },
+    {
+      "name": "empty proof action disabled",
+      "passed": true
+    },
+    {
+      "name": "request failure has retry and no success",
+      "passed": true
+    },
+    {
+      "name": "request retry succeeds",
+      "passed": true
+    },
+    {
+      "name": "timeout exposes retry",
+      "passed": true
+    },
+    {
+      "name": "scenario switch cancels stale result",
+      "passed": true
+    },
+    {
+      "name": "long claim and 45 sources at 320px",
+      "passed": true
+    },
+    {
+      "name": "many submissions retained",
+      "passed": true
+    },
+    {
+      "name": "unsafe source URL not linked",
+      "passed": true
+    },
+    {
+      "name": "unknown timestamp explicit",
+      "passed": true
+    },
+    {
+      "name": "unknown network visible on mobile",
+      "passed": true
+    },
+    {
+      "name": "/gaps: honest empty state",
+      "passed": true
+    },
+    {
+      "name": "/receipts: honest empty state",
+      "passed": true
+    },
+    {
+      "name": "home API offline distinct from empty",
+      "passed": true
+    },
+    {
+      "name": "API offline label visible on mobile",
+      "passed": true
+    },
+    {
+      "name": "server route retry refreshes records",
+      "passed": true
+    },
+    {
+      "name": "record 404 distinct from offline",
+      "passed": true
+    },
+    {
+      "name": "keyboard skip link first",
+      "passed": true
+    },
+    {
+      "name": "focus visibly outlined",
+      "passed": true
+    },
+    {
+      "name": "skip reaches main",
+      "passed": true
+    },
+    {
+      "name": "reduced motion static story",
+      "passed": true
+    },
+    {
+      "name": "reduced motion removes animation",
+      "passed": true
+    },
+    {
+      "name": "chapter direct navigation",
+      "passed": true
+    },
+    {
+      "name": "home: 200% CSS zoom reflow",
+      "passed": true
+    },
+    {
+      "name": "lab: 200% CSS zoom reflow",
+      "passed": true
+    },
+    {
+      "name": "market: 200% CSS zoom reflow",
+      "passed": true
+    },
+    {
+      "name": "gap: 200% CSS zoom reflow",
+      "passed": true
+    },
+    {
+      "name": "archive: 200% CSS zoom reflow",
+      "passed": true
+    },
+    {
+      "name": "receipt: 200% CSS zoom reflow",
+      "passed": true
+    },
+    {
+      "name": "verify: 200% CSS zoom reflow",
+      "passed": true
+    },
+    {
+      "name": "zero unexpected page errors",
+      "passed": true
+    },
+    {
+      "name": "axe: no detected WCAG A/AA violations",
+      "passed": true
+    }
+  ],
+  "accessibility": [
+    {
+      "route": "home",
+      "violations": []
+    },
+    {
+      "route": "lab",
+      "violations": []
+    },
+    {
+      "route": "market",
+      "violations": []
+    },
+    {
+      "route": "gap",
+      "violations": []
+    },
+    {
+      "route": "archive",
+      "violations": []
+    },
+    {
+      "route": "receipt",
+      "violations": []
+    },
+    {
+      "route": "verify",
+      "violations": []
+    },
+    {
+      "route": "lab-populated",
+      "violations": []
+    }
+  ],
+  "errors": [],
+  "metrics": {
+    "home": {
+      "lcpMs": 216,
+      "fcpMs": 216,
+      "resources": [
+        {
+          "name": "/_next/static/css/b17f98b5787c6ab5.css",
+          "transferBytes": 10696,
+          "encodedBytes": 10396,
+          "decodedBytes": 48753
+        },
+        {
+          "name": "/_next/static/chunks/webpack-7dfed45c813d998f.js",
+          "transferBytes": 2068,
+          "encodedBytes": 1768,
+          "decodedBytes": 3483
+        },
+        {
+          "name": "/_next/static/chunks/9e69aa56-f4a1dd1a9610c5d3.js",
+          "transferBytes": 54658,
+          "encodedBytes": 54358,
+          "decodedBytes": 173019
+        },
+        {
+          "name": "/_next/static/chunks/main-app-ee1b18953b3b5761.js",
+          "transferBytes": 858,
+          "encodedBytes": 558,
+          "decodedBytes": 558
+        },
+        {
+          "name": "/_next/static/chunks/112-b4c32a9af0ee8fd8.js",
+          "transferBytes": 46598,
+          "encodedBytes": 46298,
+          "decodedBytes": 173655
+        },
+        {
+          "name": "/_next/static/chunks/894-e4ef28cd9399bc6d.js",
+          "transferBytes": 3687,
+          "encodedBytes": 3387,
+          "decodedBytes": 8531
+        },
+        {
+          "name": "/_next/static/chunks/app/layout-2b9ef7d707e6e453.js",
+          "transferBytes": 1097,
+          "encodedBytes": 797,
+          "decodedBytes": 797
+        },
+        {
+          "name": "/_next/static/chunks/app/error-f384c03cc6bef976.js",
+          "transferBytes": 1212,
+          "encodedBytes": 912,
+          "decodedBytes": 912
+        },
+        {
+          "name": "/_next/static/chunks/e809d3ec-457a0d5f7426fd4c.js",
+          "transferBytes": 20083,
+          "encodedBytes": 19783,
+          "decodedBytes": 51544
+        },
+        {
+          "name": "/_next/static/chunks/53-0bb23f418622f59e.js",
+          "transferBytes": 33771,
+          "encodedBytes": 33471,
+          "decodedBytes": 82432
+        },
+        {
+          "name": "/_next/static/chunks/app/page-593917725ca18bdb.js",
+          "transferBytes": 6062,
+          "encodedBytes": 5762,
+          "decodedBytes": 16019
+        },
+        {
+          "name": "/fonts/dm-sans.woff2",
+          "transferBytes": 37232,
+          "encodedBytes": 36932,
+          "decodedBytes": 36932
+        },
+        {
+          "name": "/fonts/instrument-serif.woff2",
+          "transferBytes": 21332,
+          "encodedBytes": 21032,
+          "decodedBytes": 21032
+        },
+        {
+          "name": "/fonts/instrument-serif-italic.woff2",
+          "transferBytes": 22428,
+          "encodedBytes": 22128,
+          "decodedBytes": 22128
+        },
+        {
+          "name": "/gaps",
+          "transferBytes": 428,
+          "encodedBytes": 128,
+          "decodedBytes": 128
+        },
+        {
+          "name": "/receipts",
+          "transferBytes": 433,
+          "encodedBytes": 133,
+          "decodedBytes": 136
+        },
+        {
+          "name": "/verify",
+          "transferBytes": 431,
+          "encodedBytes": 131,
+          "decodedBytes": 132
+        },
+        {
+          "name": "/lab",
+          "transferBytes": 427,
+          "encodedBytes": 127,
+          "decodedBytes": 126
+        }
+      ],
+      "htmlTransferBytes": 8954
+    },
+    "sourceClickToSecondFrameMs": 49
+  }
+}

@@ -71,6 +71,47 @@ try {
         await page.screenshot({ path: `${out}/${name}-${width}.png`, fullPage: true });
     }
   }
+  // The home composition is recorded while the real GSAP timelines run.
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await go("/");
+  await page.getByRole("button", { name: "Replay motion" }).click();
+  await page.waitForTimeout(1100);
+  await page
+    .locator(".exchange-cover .dossier-scene")
+    .screenshot({ path: `${out}/motion-hero-1s.png` });
+  await page.waitForTimeout(2100);
+  await page
+    .locator(".exchange-cover .dossier-scene")
+    .screenshot({ path: `${out}/motion-hero-3s.png` });
+  await page.getByRole("button", { name: "Pause motion" }).click();
+  check(
+    "hero pause control",
+    await page.getByRole("button", { name: "Play motion", exact: true }).isVisible(),
+  );
+  await page.getByRole("button", { name: "Replay motion" }).click();
+  await go("/lab");
+  check("interrupted hero navigation", await page.locator(".lab-controls").isVisible());
+  await go("/");
+  await page.getByRole("button", { name: "04 Record" }).click();
+  await page.waitForTimeout(900);
+  await page
+    .locator(".story-stage")
+    .screenshot({ path: `${out}/motion-story-record.png` });
+  const forward = await page.locator(".dossier-story .claim-paper").getAttribute("style");
+  await page.getByRole("button", { name: "01 Request" }).click();
+  await page.waitForTimeout(900);
+  await page
+    .locator(".story-stage")
+    .screenshot({ path: `${out}/motion-story-request.png` });
+  check(
+    "story reverse changes geometry",
+    forward !== (await page.locator(".dossier-story .claim-paper").getAttribute("style")),
+  );
+  await page.setViewportSize({ width: 768, height: 1000 });
+  await page.getByRole("button", { name: "03 Allocate" }).click();
+  await page.waitForTimeout(700);
+  await noOverflow("story resize during timeline");
+  await page.setViewportSize({ width: 1440, height: 1000 });
   // One result, five chapters; sources are selected by keyboard and stay selected.
   await go("/lab");
   let calls = 0;
@@ -81,6 +122,15 @@ try {
     await page.locator(`input[value=${scenario}]`).check();
     await page.getByRole("button", { name: "Run this experiment" }).click();
     await page.getByText("Experiment complete.").waitFor();
+    const requestCount = calls;
+    await page.getByRole("button", { name: "Pause playback" }).click();
+    await page.getByRole("slider", { name: "Seek completed result" }).fill("7.5");
+    await page
+      .locator(".source-journey")
+      .screenshot({ path: `${out}/motion-lab-${scenario}-allocate.png` });
+    check(`${scenario}: seek sends no request`, calls === requestCount);
+    await page.getByRole("button", { name: "Replay from start" }).click();
+    await page.getByRole("button", { name: "Pause playback" }).click();
     const run = runs[scenario];
     check(
       `${scenario}: all returned sources listed`,
@@ -462,8 +512,12 @@ try {
       .locator(".cover-copy")
       .evaluate((e) => getComputedStyle(e).animationName === "none"),
   );
-  await page.locator(".chapter-nav a").last().click();
-  check("chapter direct navigation", new URL(page.url()).hash === "#chapter-4");
+  await page.locator(".chapter-nav button").last().click();
+  check(
+    "chapter direct navigation",
+    (await page.locator(".chapter-nav button").last().getAttribute("aria-current")) ===
+      "step",
+  );
   for (const [name, path] of routes) {
     await go(path);
     await page.evaluate(() => (document.documentElement.style.zoom = "2"));
@@ -544,6 +598,64 @@ try {
   report.metrics.sourceClickToSecondFrameMs = await page.evaluate(
     () => window.__interaction,
   );
+  for (const [name, path, action] of [
+    [
+      "hero",
+      "/",
+      async (clip) => {
+        await clip.getByRole("button", { name: "Replay motion" }).click();
+        await clip.waitForTimeout(5500);
+      },
+    ],
+    [
+      "story",
+      "/",
+      async (clip) => {
+        for (const title of ["01 Request", "02 Inspect", "03 Allocate", "04 Record"]) {
+          await clip.getByRole("button", { name: title }).click();
+          await clip.waitForTimeout(1100);
+        }
+      },
+    ],
+    [
+      "lab",
+      "/lab",
+      async (clip) => {
+        await clip.getByRole("button", { name: "Run this experiment" }).click();
+        await clip.getByText("Experiment complete.").waitFor();
+        await clip.getByRole("button", { name: "Replay from start" }).click();
+        await clip.waitForTimeout(10500);
+      },
+    ],
+  ]) {
+    const clipContext = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      recordVideo: { dir: out, size: { width: 1440, height: 900 } },
+    });
+    const clip = await clipContext.newPage();
+    await clip.goto(base + path, { waitUntil: "networkidle" });
+    await action(clip);
+    const video = clip.video();
+    await clipContext.close();
+    if (video) await video.saveAs(`${out}/motion-${name}.webm`);
+  }
+  const mobileContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    recordVideo: { dir: out, size: { width: 390, height: 844 } },
+  });
+  const mobile = await mobileContext.newPage();
+  await mobile.goto(base, { waitUntil: "networkidle" });
+  for (const title of ["01 Request", "02 Inspect", "03 Allocate", "04 Record"]) {
+    await mobile.getByRole("button", { name: title }).click();
+    await mobile.waitForTimeout(1250);
+    if (title === "03 Allocate")
+      await mobile
+        .locator(".story-stage")
+        .screenshot({ path: `${out}/motion-story-mobile-allocate.png` });
+  }
+  const mobileVideo = mobile.video();
+  await mobileContext.close();
+  if (mobileVideo) await mobileVideo.saveAs(`${out}/motion-story-mobile.webm`);
   await perf.screenshot({ path: resolve(out, "../frontend-home.png") });
   await page.evaluate(() => {
     const dossier = document.querySelector(".lab-dossier");
