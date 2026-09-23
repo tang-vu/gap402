@@ -21,3 +21,11 @@ The four requested reference pages returned HTTP 200 in Chromium. [Bearplus](ima
 The isolated review built to `NEXT_DIST_DIR=.next-motion-review` with `GAP402_API=http://127.0.0.1:4028`. Its last reviewed build ID was `hLu1LV6A48voiQymX03Bi`, with stylesheet `b17f98b5787c6ab5.css`. Before publication, the public hostname returned the older `e1a9360668464390.css` stylesheet and the local production `.next` build ID was `QyYDwWQzf1-M_EgdUlsPA`. Those are artifact/version identifiers, not source commit hashes. The old production artifact predates the reviewed source commit and has no embedded source SHA, so its precise build source cannot be proven from the artifact alone.
 
 The full workspace lint, typecheck, test and production build passed in an isolated Linux copy. The Arc contract CLI was unavailable in this shell (`arc-forge: command not found`); contract code was not changed.
+
+## Public publication / 23 September 2026
+
+The reviewed source was committed and pushed as `0e771b4`. The production build used the same web source, package manifest, Next config and lockfile bytes as that commit, with `GAP402_API=http://127.0.0.1:4020`. Its Next build ID is `cV3ix0D9Cd2iRoUXXR-gI` and its stylesheet is `b17f98b5787c6ab5.css`.
+
+The first host switch used an artifact whose internal Next manifest still named its isolated dist directory. It reached startup but did not serve requests; the previous build was restored and confirmed HTTP 200. A new artifact was built with Next's default `.next` directory, verified on port 3048 against the production API, then switched into the web host. The API and tunnel processes were not restarted.
+
+After the final switch, both `127.0.0.1:3043` and [the public hostname](https://gap402.tangvu.dev/) returned HTTP 200 and the new stylesheet. Public `/api/demo` calls returned three sources plus plan and receipt for mixed, one source plus plan and receipt for rejected, and three sources with no plan or receipt for insufficient. All three returned `actualSpendUnits: "0"`. PM2 saved the web/API/tunnel process list with all three online. The earlier public artifact had build ID `QyYDwWQzf1-M_EgdUlsPA` and stylesheet `e1a9360668464390.css`; its exact source SHA remains unembedded and therefore unknown.
