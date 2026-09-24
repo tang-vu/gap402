@@ -4,15 +4,14 @@
 **One-liner:** Gap402 turns unresolved AI knowledge gaps into USDC-funded
 evidence markets on Arc.
 
-## Eligibility checked September 22, 2026
+## Eligibility checked September 24, 2026
 
 [Current Arc Microgrants rules](https://community.arc.io/public/events/arc-microgrants-f8tijfjhyq)
 require a working mainnet deployment and an openable link, public repository,
 short Arc-use description, and builder profile. Deadline: October 14, 2026,
-23:59 ET; reviews are rolling. This document is **draft submission copy**,
-not a claim that a local/testnet demo is eligible. Mainnet deployment, a public
-URL, and a real settlement proof remain required. Confirm that this work has
-not already received Circle/Arc funding before submission.
+23:59 ET; reviews are rolling. The mainnet deployment and settlement below are
+confirmed. This document remains **draft submission copy** until the builder
+confirms that this project has not already received Circle/Arc funding.
 
 ## Reviewable product improvements
 
@@ -56,11 +55,16 @@ immutable, and exact.
 
 - Contracts: `GapBounty` + `EvidenceReceiptRegistry` (23 Foundry tests,
   fuzz-covered, no proxies/admin keys).
-- Status: **verified running end-to-end on `arc-anvil --network arc`**
-  (local emulation of mainnet USDC semantics). Mainnet deployment is
-  gated behind documented, fail-closed scripts — see
-  [deployment.md](deployment.md). *(Update this section with the mainnet
-  contract address + tx hashes after `pnpm deploy` runs against mainnet.)*
+- Arc mainnet (chain `5042`): [GapBounty
+  `0xadaec572036fce9b6c7b4a1e4aa979ac57c5d183`](https://explorer.arc.io/address/0xadaec572036fce9b6c7b4a1e4aa979ac57c5d183)
+  and [EvidenceReceiptRegistry
+  `0x89dec1F5223d8BB64a39643790115e553C24fF65`](https://explorer.arc.io/address/0x89dec1F5223d8BB64a39643790115e553C24fF65).
+- [Deployment transaction](https://explorer.arc.io/tx/0x881fccde46362bc2b72f192ddcd4a787fac0da8e9cada664ed59ec6d98bf11a1),
+  [0.05 USDC bounty funding](https://explorer.arc.io/tx/0xddca31454992b56dd8ac935ae6ee54e83712ef3ce92db25408880f842078c664),
+  and [settlement](https://explorer.arc.io/tx/0x8a543db2c35a5cabfc1fca9b4e119cc6e4f1fac34630a13b8e7e3bd47ca786db)
+  all returned successful receipts on September 24, 2026.
+- Review at [the public mainnet run](https://gap402.tangvu.dev/mainnet), or
+  [download the portable proof](../apps/web/public/mainnet-proof.json).
 
 ## Repo
 
@@ -68,19 +72,23 @@ immutable, and exact.
 allocator, verifier, SDK, API+SQLite, CLI, MCP server, Next.js UI,
 autonomous buyer/supplier agents, deterministic `pnpm demo`.
 
-## Example receipt
+## Mainnet receipt summary
 
 ```json
 {
   "protocol": "gap402", "version": "1",
-  "targetClaim": "Acme Corp deployed WidgetNet in Vietnam before 2026-09-01",
-  "acceptedEvidence": [ { "url": "…", "payoutUnits": "27886" } ],
-  "receiptHash": "0x…",
-  "network": "local"
+  "targetClaim": "Arc mainnet exposes USDC at 0x3600000000000000000000000000000000000000",
+  "acceptedEvidence": 2,
+  "totalPaidUnits": "35750",
+  "refundUnits": "14250",
+  "receiptHash": "0xcc5902d07332f44a6a046157c4b42bff112b4a94d95777ea24a5fe84cf7880e3",
+  "network": "mainnet"
 }
 ```
 
-*(Mainnet receipt example goes here after the first live settlement.)*
+The registry's `isAnchored(receiptHash)` returned `true` on mainnet. The
+portable bundle passed all offline CLI integrity checks. The supplier payout was
+0.03325 USDC, the verifier fee 0.0025 USDC, and 0.01425 USDC was refunded.
 
 ## Independence
 
@@ -98,7 +106,10 @@ imports or depends on Keryx.
 
 ## Honest notes
 
-- Demo evidence sources are labelled fixtures; real web sourcing works via
-  the `SourceProvider` seam and `DEMO_SOURCE_URLS` on mainnet.
+- The public Evidence Lab uses labelled fixtures and zero spend. The separate
+  mainnet run fetched the Arc and Circle contract-address pages.
+- The mainnet run used the labelled mock semantic scorer and two wallets
+  controlled by the prototype operator. It proves contract funding, payout,
+  accounting and receipt anchoring, not third-party demand or source truth.
 - The verifier is trusted for *judgment* in v1; the contract enforces
   *accounting* exactly.

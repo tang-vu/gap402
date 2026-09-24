@@ -44,6 +44,9 @@ export default async function Home() {
             <Link className="text-link" href="/gaps">
               Browse open gaps →
             </Link>
+            <Link className="text-link" href="/mainnet">
+              Inspect the Arc mainnet run →
+            </Link>
           </div>
           <p className="cover-footnote">01 / Declare the gap. Let evidence close it.</p>
         </div>

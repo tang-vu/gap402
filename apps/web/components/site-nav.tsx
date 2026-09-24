@@ -10,6 +10,7 @@ export function SiteNav() {
           ["/gaps", "Market"],
           ["/receipts", "Receipts"],
           ["/verify", "Verify proof"],
+          ["/mainnet", "Mainnet run"],
         ] as const
       ).map(([href, label]) => (
         <Link

@@ -75,7 +75,7 @@ arc-forge verify-contract <address> src/GapBounty.sol:GapBounty \
 
 | network | GapBounty | ReceiptRegistry | status |
 | --- | --- | --- | --- |
-| mainnet | — | — | **not deployed** — requires funded key + explicit run |
+| mainnet | [`0xadaec5…5d183`](https://explorer.arc.io/address/0xadaec572036fce9b6c7b4a1e4aa979ac57c5d183) | [`0x89dec1…4fF65`](https://explorer.arc.io/address/0x89dec1F5223d8BB64a39643790115e553C24fF65) | deployed 2026-09-24; [deployment tx](https://explorer.arc.io/tx/0x881fccde46362bc2b72f192ddcd4a787fac0da8e9cada664ed59ec6d98bf11a1) and [settlement tx](https://explorer.arc.io/tx/0x8a543db2c35a5cabfc1fca9b4e119cc6e4f1fac34630a13b8e7e3bd47ca786db) confirmed |
 | testnet | — | — | not deployed |
 | local | per-run | per-run | `pnpm demo` deploys fresh each run |
 # Authenticated operator writes and public reviewer UI

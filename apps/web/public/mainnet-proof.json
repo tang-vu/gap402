@@ -1,0 +1,148 @@
+{
+  "gap": {
+    "protocol": "gap402",
+    "version": "1",
+    "id": "gap_14cb9029f31149f2b2f8",
+    "question": "What is the USDC ERC-20 interface address on Arc mainnet?",
+    "claim": "Arc mainnet exposes USDC at 0x3600000000000000000000000000000000000000",
+    "context": "arc mainnet controlled demo",
+    "requirements": {
+      "claim": "Arc mainnet exposes USDC at 0x3600000000000000000000000000000000000000",
+      "requirePrimarySource": false,
+      "requireIndependentSources": false,
+      "minIndependentSources": 0,
+      "expectedEvidenceType": "any",
+      "minSupportScore": 500000,
+      "rejectDuplicates": true,
+      "requireCitation": true
+    },
+    "budgetUnits": "50000",
+    "currency": "USDC",
+    "requester": {
+      "id": "mainnet-demo",
+      "kind": "service",
+      "walletAddress": "0x850e50B1530DEebED676445fbB54D56eeF1db1D4"
+    },
+    "requesterAddress": "0x850e50B1530DEebED676445fbB54D56eeF1db1D4",
+    "verifierAddress": "0x850e50B1530DEebED676445fbB54D56eeF1db1D4",
+    "createdAt": "2026-09-24T16:59:04.732Z",
+    "deadline": "2026-09-24T17:59:04.732Z",
+    "status": "settled"
+  },
+  "plan": {
+    "protocol": "gap402",
+    "version": "1",
+    "id": "plan_0171469a272141d39ca0",
+    "bountyId": "gap_14cb9029f31149f2b2f8",
+    "algorithmVersion": "gap402-portfolio-v1",
+    "distributableUnits": "47500",
+    "verifierFeeUnits": "2500",
+    "verifierAddress": "0x850e50B1530DEebED676445fbB54D56eeF1db1D4",
+    "payouts": [
+      {
+        "submissionId": "sub_31bb4d37a09c46ebb369",
+        "recipient": "0x97b7067f656c6c88c28595cf48643c3e74ab40f3",
+        "amountUnits": "33250",
+        "shareBps": 7000,
+        "explanation": {
+          "factors": {
+            "support": 875000,
+            "provenance": 300000,
+            "independence": 500000,
+            "novelty": 900000,
+            "freshness": 500000
+          },
+          "quality": 59062,
+          "shareBps": 7000,
+          "capped": true,
+          "belowMinPayout": false,
+          "note": "aggregated 2 accepted submissions"
+        }
+      },
+      {
+        "submissionId": "verifier-fee",
+        "recipient": "0x850e50B1530DEebED676445fbB54D56eeF1db1D4",
+        "amountUnits": "2500",
+        "shareBps": 500,
+        "explanation": {
+          "factors": {
+            "support": 0,
+            "provenance": 0,
+            "independence": 0,
+            "novelty": 0,
+            "freshness": 0
+          },
+          "quality": 0,
+          "shareBps": 500,
+          "capped": false,
+          "belowMinPayout": false,
+          "note": "verifier/protocol allocation"
+        }
+      }
+    ],
+    "totalPaidUnits": "35750",
+    "refundUnits": "14250",
+    "settlementHash": "0x88830613a79a695665dca81db44d1d43acaf0c319c44be895cc4a27edb8059fc",
+    "createdAt": "2026-09-24T16:59:22.885Z"
+  },
+  "receipt": {
+    "protocol": "gap402",
+    "version": "1",
+    "id": "rcpt_fa8b1b0ee6d3476388b2",
+    "bountyId": "gap_14cb9029f31149f2b2f8",
+    "requestHash": "0xd1f9bb02721fe7aba0be1c1088dbea90578eb547284921648f5dd8dbb70cae7d",
+    "targetClaim": "Arc mainnet exposes USDC at 0x3600000000000000000000000000000000000000",
+    "chainId": 5042,
+    "bountyContract": "0xadaec572036fce9b6c7b4a1e4aa979ac57c5d183",
+    "acceptedEvidence": [
+      {
+        "submissionId": "sub_31bb4d37a09c46ebb369",
+        "url": "https://docs.arc.io/arc/references/contract-addresses",
+        "contentHash": "0x11f33278318653b4d29cc435f595209f003e8d0a31bc6963ce10142962bc2aa9",
+        "supplier": {
+          "id": "search-supplier",
+          "kind": "service",
+          "walletAddress": "0x97B7067F656c6c88C28595CF48643C3e74aB40F3"
+        },
+        "supplierAddress": "0x97B7067F656c6c88C28595CF48643C3e74aB40F3",
+        "scores": {
+          "support": 875000,
+          "provenance": 300000,
+          "independence": 500000,
+          "novelty": 900000,
+          "freshness": 500000
+        },
+        "payoutUnits": "33250"
+      },
+      {
+        "submissionId": "sub_364c60f20f7b42068264",
+        "url": "https://developers.circle.com/stablecoins/usdc-contract-addresses",
+        "contentHash": "0x1deac7a0bfdf04acf13f0c02d7cbf6ad0f821b90009073d1d1c180800bfdc0dc",
+        "supplier": {
+          "id": "search-supplier",
+          "kind": "service",
+          "walletAddress": "0x97B7067F656c6c88C28595CF48643C3e74aB40F3"
+        },
+        "supplierAddress": "0x97B7067F656c6c88C28595CF48643C3e74aB40F3",
+        "scores": {
+          "support": 875000,
+          "provenance": 300000,
+          "independence": 500000,
+          "novelty": 900000,
+          "freshness": 500000
+        },
+        "payoutUnits": "0"
+      }
+    ],
+    "rejectedEvidence": [],
+    "totalPaidUnits": "35750",
+    "refundUnits": "14250",
+    "verifierFeeUnits": "2500",
+    "settlementHash": "0x88830613a79a695665dca81db44d1d43acaf0c319c44be895cc4a27edb8059fc",
+    "receiptHash": "0xcc5902d07332f44a6a046157c4b42bff112b4a94d95777ea24a5fe84cf7880e3",
+    "evaluatorVersion": "gap402-verifier-1.0.0+mock-v1",
+    "network": "mainnet",
+    "createdAt": "2026-09-24T16:59:22.892Z",
+    "settlementTx": "0x8a543db2c35a5cabfc1fca9b4e119cc6e4f1fac34630a13b8e7e3bd47ca786db"
+  }
+}

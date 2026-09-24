@@ -26,7 +26,9 @@ question
 ## Quickstart
 
 **[Open the public demo](https://gap402.tangvu.dev)** — interactive sandbox with
-synthetic evidence and zero actual spend. This is not a mainnet deployment.
+synthetic evidence and zero actual spend. The separate
+[Arc mainnet run](https://gap402.tangvu.dev/mainnet) shows a settled bounty,
+explorer transactions, and a portable proof.
 See [self-hosting operations](docs/self-hosting.md) for the PM2/Cloudflare setup.
 
 Prereqs: Node 22+, pnpm 11+, and Arc Foundry (`arc-anvil`, `arc-forge`)
@@ -254,8 +256,8 @@ MAINNET_ENABLED=true DEMO_CONFIRM=YES DEMO_MAX_USDC=0.10 \
   GAP_BOUNTY_ADDRESS=0x… pnpm demo:mainnet
 ```
 
-Deployment addresses land in `deployments/<network>.json`. **None are
-deployed to mainnet yet** — see [docs/arc-microgrant.md](docs/arc-microgrant.md).
+Deployment addresses land in `deployments/<network>.json`. Gap402 is deployed
+and settled on Arc mainnet; see [the transaction record](docs/arc-microgrant.md).
 
 ## Docs
 

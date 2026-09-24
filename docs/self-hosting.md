@@ -2,9 +2,11 @@
 
 Public demo: **https://gap402.tangvu.dev**
 
-This is a public product sandbox, not an Arc mainnet deployment. Evidence fixtures
-and semantic scores are simulated, actual spend is zero, and the interface states
-these limits. The runtime deliberately clears signing keys and contract settings.
+The market and Evidence Lab are a public product sandbox. Evidence fixtures and
+semantic scores there are simulated, and actual spend is zero. A separate
+[`/mainnet`](https://gap402.tangvu.dev/mainnet) page presents a recorded Arc
+mainnet settlement with explorer links and a downloadable proof. The public
+runtime deliberately clears signing keys and contract settings.
 
 ## Runtime
 

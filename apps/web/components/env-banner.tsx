@@ -15,7 +15,7 @@ export async function EnvBanner() {
       : network === "testnet"
         ? "ARC TESTNET"
         : network === "local"
-          ? "LOCAL"
+          ? "PUBLIC SANDBOX / LOCAL"
           : "NETWORK UNKNOWN";
   return (
     <div className={`banner ${network}`}>
