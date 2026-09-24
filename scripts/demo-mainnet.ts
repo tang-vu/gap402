@@ -63,7 +63,8 @@ class HttpSourceProvider implements SourceProvider {
             .replace(/\s+/g, " ")
             .slice(0, 1500),
           claimRelation: "unknown" as const,
-          sourceType: "independent",
+          // A fetched page is not necessarily independent of the claim's subject.
+          // Leave provenance unclassified until a supplier can establish it.
         });
       } catch (e) {
         line(`  [provider] fetch failed ${url}: ${(e as Error).message}`);
