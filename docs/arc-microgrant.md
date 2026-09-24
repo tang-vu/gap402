@@ -113,3 +113,24 @@ imports or depends on Keryx.
   accounting and receipt anchoring, not third-party demand or source truth.
 - The verifier is trusted for *judgment* in v1; the contract enforces
   *accounting* exactly.
+
+## DoraHacks submission fields
+
+The [official submission form](https://dorahacks.io/hackathon/arc-microgrants)
+asks for the following. Confirm the personal and eligibility answers with the
+builder before submitting.
+
+| Field | Answer |
+| --- | --- |
+| Project name | Gap402 |
+| Your name, alias, or team name | tang-vu |
+| Contact email | Builder to provide |
+| Public builder profile | https://github.com/tang-vu |
+| Live deployment on Arc mainnet | https://gap402.tangvu.dev/mainnet |
+| Arc mainnet contract address or transaction hash | `0xadaec572036fce9b6c7b4a1e4aa979ac57c5d183` (settlement `0x8a543db2c35a5cabfc1fca9b4e119cc6e4f1fac34630a13b8e7e3bd47ca786db`) |
+| Public repo | https://github.com/tang-vu/gap402 |
+| In two sentences, what does your project do? | Gap402 lets AI agents post USDC bounties for missing evidence, then evaluates supplier submissions and splits the escrow by a deterministic settlement plan. Each resolution produces a portable Evidence Receipt whose integrity can be checked independently. |
+| What does it use Arc for? | Gap402 escrows the bounty in USDC on Arc mainnet, pays the supplier and verifier, refunds the unused amount, and anchors the receipt hash in a separate registry contract. The public mainnet run links the funding and settlement transactions and the proof bundle. |
+| Had you deployed to Arc before this project? | Builder to confirm: Mainnet / Testnet / No |
+| Have you received a Circle or Arc grant, bounty, or prize for this project? | Builder to confirm: Yes / No |
+| Anything else we should see? | The `/mainnet` page downloads the proof and links every transaction. The run fetched two real public pages but used a mock semantic scorer and operator-controlled supplier/verifier wallets; the Evidence Lab is a separate zero-spend sandbox. |

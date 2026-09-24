@@ -35,10 +35,12 @@ if (windows) {
       "/usr/local/bin/node",
       `${linuxRoot}/scripts/host-service.mjs`,
       role,
+      role === "web" ? (process.env.GAP402_WEB_RUNTIME_ROOT ?? "") : "",
     ],
     { cwd: root, stdio: ["pipe", "inherit", "inherit"], windowsHide: true },
   );
 } else {
+  const serviceRoot = role === "web" && process.argv[3] ? path.resolve(process.argv[3]) : root;
   const env = {
     ...process.env,
     NODE_ENV: "production",
@@ -66,7 +68,7 @@ if (windows) {
           "3043",
         ];
   child = spawn(process.execPath, args, {
-    cwd: root,
+    cwd: serviceRoot,
     env,
     stdio: ["ignore", "inherit", "inherit"],
   });

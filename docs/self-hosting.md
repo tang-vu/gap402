@@ -66,6 +66,11 @@ For a frontend update, stop `gap402-web`, build with
 `wsl -d Ubuntu --exec bash -lc 'cd /mnt/d/Github/Hackathon/gap402 && pnpm --filter @gap402/web build'`,
 then start it again with `scripts/start-host.ps1`. Do not rebuild `.next` while
 the production process reads it. A single instance has deployment downtime.
+On this host, WSL file access on the Windows checkout can stall Next startup.
+The web process may instead use a Linux-side checkout and build by setting
+`GAP402_WEB_RUNTIME_ROOT` to its absolute Linux path when restarting
+`gap402-web` with `pm2 restart gap402-web --update-env`. Save the PM2 process
+list afterward. The API and tunnel continue to use the Windows checkout.
 For API source changes restart `gap402-api` after the relevant tests pass.
 
 To retire this host, stop only the three named PM2 processes and disable only
