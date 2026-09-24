@@ -16,7 +16,7 @@
  * or missing DEMO_CONFIRM aborts before any transaction is sent.
  */
 import { setTimeout as sleep } from "node:timers/promises";
-import { Gap402, Gap402Chain } from "@gap402/sdk";
+import { Gap402, Gap402Chain, type GapView } from "@gap402/sdk";
 import {
   resolveNetwork,
   formatUsdcAmount,
@@ -160,21 +160,38 @@ async function main() {
     },
     heuristicCoverage,
   );
-  const buyerPromise = buyer.ensureEvidence({
-    question,
-    claim,
-    context: "arc mainnet controlled demo",
-    evidence: [], // deliberately empty: force the gap
-    budgetUnits: bountyAmount,
-    deadlineSeconds: 3600,
-  });
-  await sleep(800);
-  const { gaps } = await new Gap402({ api }).listGaps();
-  const gapId = gaps[gaps.length - 1]!.gap.id;
+  const priorGapIds = new Set(
+    (await new Gap402({ api }).listGaps()).gaps.map((view) => view.gap.id),
+  );
+  let buyerError: Error | undefined;
+  const buyerPromise = buyer
+    .ensureEvidence({
+      question,
+      claim,
+      context: "arc mainnet controlled demo",
+      evidence: [], // deliberately empty: force the gap
+      budgetUnits: bountyAmount,
+      deadlineSeconds: 3600,
+    })
+    .catch((error: unknown) => {
+      buyerError = error instanceof Error ? error : new Error(String(error));
+      return null;
+    });
+  let fundedGap: GapView | undefined;
+  for (let attempt = 0; attempt < 120; attempt++) {
+    const { gaps } = await new Gap402({ api }).listGaps();
+    fundedGap = gaps.find(
+      (view) => !priorGapIds.has(view.gap.id) && Boolean(view.runtime.fundTxHash),
+    );
+    if (fundedGap) break;
+    if (buyerError) throw buyerError;
+    await sleep(1000);
+  }
+  if (!fundedGap) throw new Error("funding was not confirmed within 120 seconds");
+  const gapId = fundedGap.gap.id;
   line(`  bounty open: ${gapId}`);
-  const rt: any = await fetch(`${api}/api/gaps/${gapId}`).then((r) => r.json());
   line(
-    `  fund tx: ${rt.runtime.fundTxHash} ${explorerTxUrl(network.explorerUrl, rt.runtime.fundTxHash ?? "") ?? ""}`,
+    `  fund tx: ${fundedGap.runtime.fundTxHash} ${explorerTxUrl(network.explorerUrl, fundedGap.runtime.fundTxHash ?? "") ?? ""}`,
   );
 
   step(3, "suppliers fetch REAL sources");
@@ -192,10 +209,13 @@ async function main() {
   }
 
   step(4, "evaluate + settle ON MAINNET");
-  const fin: any = await fetch(`${api}/api/gaps/${gapId}/finalize`, {
+  const finResponse = await fetch(`${api}/api/gaps/${gapId}/finalize`, {
     method: "POST",
     headers: { authorization: `Bearer ${process.env.GAP402_WRITE_TOKEN}` },
-  }).then((r) => r.json());
+  });
+  if (!finResponse.ok)
+    throw new Error(`finalize failed ${finResponse.status}: ${await finResponse.text()}`);
+  const fin: any = await finResponse.json();
   line(`  settlement tx: ${fin.settlementTx}`);
   line(`  explorer: ${explorerTxUrl(network.explorerUrl, fin.settlementTx ?? "") ?? ""}`);
   for (const p of fin.plan.payouts) {
@@ -208,6 +228,7 @@ async function main() {
   line(`  receiptHash: ${fin.receipt.receiptHash}`);
 
   const result = await buyerPromise;
+  if (!result) throw buyerError ?? new Error("buyer did not finish");
   line(
     `  coverage: ${(result.coverageBeforeBps / 100).toFixed(0)}% -> ${((result.coverageAfterBps ?? 0) / 100).toFixed(0)}%`,
   );

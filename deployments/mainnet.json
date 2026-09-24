@@ -1,0 +1,12 @@
+{
+  "network": "mainnet",
+  "chainId": 5042,
+  "usdc": "0x3600000000000000000000000000000000000000",
+  "gapBounty": "0xadaec572036fce9b6c7b4a1e4aa979ac57c5d183",
+  "receiptRegistry": "0x89dec1F5223d8BB64a39643790115e553C24fF65",
+  "deployedAt": "2026-09-24T16:46:52.156Z",
+  "explorer": {
+    "gapBounty": "https://explorer.arc.io/address/0xadaec572036fce9b6c7b4a1e4aa979ac57c5d183",
+    "receiptRegistry": "https://explorer.arc.io/address/0x89dec1F5223d8BB64a39643790115e553C24fF65"
+  }
+}
