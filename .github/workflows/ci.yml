@@ -29,12 +29,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Arc Foundry
         run: |
-          curl -sSfL https://github.com/arc-network/arc-foundry/releases/download/v0.8.0-1/arc-foundry-v0.8.0-1-x86_64-unknown-linux-gnu.tar.gz \
-            | tar -xz -C /tmp
+          asset=arc-foundry-v0.8.0-1-x86_64-unknown-linux-gnu.tar.gz
+          base=https://github.com/circlefin/arc-foundry/releases/download/v0.8.0-1
+          curl -sSfL "$base/$asset" -o "/tmp/$asset"
+          curl -sSfL "$base/$asset.sha256" -o "/tmp/$asset.sha256"
+          (cd /tmp && sha256sum -c "$asset.sha256")
+          tar -xzf "/tmp/$asset" -C /tmp
           mkdir -p "$HOME/.local/bin"
-          for b in arc-forge arc-cast arc-anvil; do
-            mv "/tmp/$b" "$HOME/.local/bin/$b" 2>/dev/null || cp "/tmp/$b" "$HOME/.local/bin/$b"
-            chmod +x "$HOME/.local/bin/$b"
+          for b in forge cast anvil; do
+            mv "/tmp/$b" "$HOME/.local/bin/arc-$b"
+            chmod +x "$HOME/.local/bin/arc-$b"
           done
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Contract tests
