@@ -52,16 +52,23 @@ class HttpSourceProvider implements SourceProvider {
           headers: { "user-agent": "gap402-evidence-bot/0.1" },
           signal: AbortSignal.timeout(10_000),
         });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
+        const plainText = text
+          .replace(/<script[\s\S]*?<\/script>/gi, " ")
+          .replace(/<style[\s\S]*?<\/style>/gi, " ")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ");
+        const focus =
+          (_q.match(/0x[0-9a-f]{40}|[a-z0-9]{5,}/gi) ?? [])
+            .sort((a, b) => b.length - a.length)
+            .map((term) => plainText.toLowerCase().indexOf(term.toLowerCase()))
+            .find((index) => index >= 0) ?? 0;
+        const excerptStart = Math.max(0, focus - 400);
         out.push({
           url,
           title: /<title[^>]*>([^<]{1,200})/i.exec(text)?.[1]?.trim(),
-          excerpt: text
-            .replace(/<script[\s\S]*?<\/script>/gi, " ")
-            .replace(/<style[\s\S]*?<\/style>/gi, " ")
-            .replace(/<[^>]+>/g, " ")
-            .replace(/\s+/g, " ")
-            .slice(0, 1500),
+          excerpt: plainText.slice(excerptStart, excerptStart + 1500),
           claimRelation: "unknown" as const,
           // A fetched page is not necessarily independent of the claim's subject.
           // Leave provenance unclassified until a supplier can establish it.
