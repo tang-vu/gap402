@@ -40,7 +40,8 @@ if (windows) {
     { cwd: root, stdio: ["pipe", "inherit", "inherit"], windowsHide: true },
   );
 } else {
-  const serviceRoot = role === "web" && process.argv[3] ? path.resolve(process.argv[3]) : root;
+  const serviceRoot =
+    role === "web" && process.argv[3] ? path.resolve(process.argv[3]) : root;
   const env = {
     ...process.env,
     NODE_ENV: "production",
