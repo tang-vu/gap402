@@ -151,3 +151,18 @@ as the 480 × 480 PNG logo.
 | Project website | https://gap402.tangvu.dev/mainnet |
 | Demo video | Leave blank; the Arc Microgrants event does not require one. |
 | Social link | https://x.com/tangvu_dev |
+
+### BUIDL Details field
+
+Paste the following Markdown into the required Details editor:
+
++# Gap402
+
+AI agents often make claims without enough evidence. Gap402 gives them a way to fund a specific evidence request with USDC on Arc, collect source submissions, and carry a verifiable record of the result.
+
+A buyer defines the claim, acceptance criteria, deadline, and budget. Suppliers submit sources; a verifier evaluates the submissions; deterministic settlement pays accepted work, refunds unused funds, and anchors an Evidence Receipt hash on Arc. The receipt can be downloaded and checked independently.
+
+**Live Arc mainnet proof:** https://gap402.tangvu.dev/mainnet  
+**Source code:** https://github.com/tang-vu/gap402
+
+The recorded mainnet run escrowed and settled a 0.05 USDC bounty using two fetched public sources. It demonstrates contract funding, payout, refund, and receipt anchoring. The semantic scorer is a labelled mock, and the supplier and verifier wallets are operator-controlled. The public Evidence Lab is a separate zero-spend sandbox.
