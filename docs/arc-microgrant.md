@@ -135,3 +135,19 @@ builder before submitting.
 | Had you deployed to Arc before this project? | Testnet (builder confirmed) |
 | Have you received a Circle or Arc grant, bounty, or prize for this project? | No (builder confirmed) |
 | Anything else we should see? | The `/mainnet` page downloads the proof and links every transaction. The run fetched two real public pages but used a mock semantic scorer and operator-controlled supplier/verifier wallets; the Evidence Lab is a separate zero-spend sandbox. |
+
+## DoraHacks BUIDL profile
+
+Creating a BUIDL profile is a separate step before submitting it to the Arc
+Microgrants event. Use the existing [Gap402 icon](assets/gap402-buidl-logo.png)
+as the 480 × 480 PNG logo.
+
+| Field | Copy |
+| --- | --- |
+| BUIDL name | Gap402 |
+| Vision | AI agents can identify a missing citation but lack a way to commission, reward, and carry forward verifiable evidence. Gap402 turns an unsupported claim into a USDC-funded bounty on Arc: suppliers submit sources, a verifier evaluates them, a deterministic settlement splits the escrow, and a portable Evidence Receipt records the result. The public Arc mainnet run demonstrates funding, payout, refund, and receipt anchoring; its semantic scorer is a labelled mock and its supplier/verifier wallets are operator-controlled. |
+| Category | Choose the closest available AI or infrastructure category. |
+| GitHub | https://github.com/tang-vu/gap402 |
+| Project website | https://gap402.tangvu.dev/mainnet |
+| Demo video | Leave blank; the Arc Microgrants event does not require one. |
+| Social link | https://x.com/tangvu_dev |
