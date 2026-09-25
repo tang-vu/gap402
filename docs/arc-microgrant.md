@@ -152,6 +152,14 @@ as the 480 × 480 PNG logo.
 | Demo video | Leave blank; the Arc Microgrants event does not require one. |
 | Social link | https://x.com/tangvu_dev |
 
+### BUIDL Team step
+
+Leave **Invite new members** empty for a solo submission. For **Team
+information**, use:
+
+> Solo builder tang-vu, developing Gap402's Arc contracts, evidence settlement,
+> agent tools, and public demo.
+
 ### BUIDL Details field
 
 Paste the following Markdown into the required Details editor:
