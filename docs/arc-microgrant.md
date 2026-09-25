@@ -10,8 +10,9 @@ evidence markets on Arc.
 require a working mainnet deployment and an openable link, public repository,
 short Arc-use description, and builder profile. Deadline: October 14, 2026,
 23:59 ET; reviews are rolling. The mainnet deployment and settlement below are
-confirmed. This document remains **draft submission copy** until the builder
-confirms that this project has not already received Circle/Arc funding.
+confirmed. The builder confirmed an earlier Arc testnet deployment and that
+Gap402 has not received a Circle/Arc grant, bounty, or prize. This remains
+**draft submission copy** pending the contact email.
 
 ## Reviewable product improvements
 
@@ -131,6 +132,6 @@ builder before submitting.
 | Public repo | https://github.com/tang-vu/gap402 |
 | In two sentences, what does your project do? | Gap402 lets AI agents post USDC bounties for missing evidence, then evaluates supplier submissions and splits the escrow by a deterministic settlement plan. Each resolution produces a portable Evidence Receipt whose integrity can be checked independently. |
 | What does it use Arc for? | Gap402 escrows the bounty in USDC on Arc mainnet, pays the supplier and verifier, refunds the unused amount, and anchors the receipt hash in a separate registry contract. The public mainnet run links the funding and settlement transactions and the proof bundle. |
-| Had you deployed to Arc before this project? | Builder to confirm: Mainnet / Testnet / No |
-| Have you received a Circle or Arc grant, bounty, or prize for this project? | Builder to confirm: Yes / No |
+| Had you deployed to Arc before this project? | Testnet (builder confirmed) |
+| Have you received a Circle or Arc grant, bounty, or prize for this project? | No (builder confirmed) |
 | Anything else we should see? | The `/mainnet` page downloads the proof and links every transaction. The run fetched two real public pages but used a mock semantic scorer and operator-controlled supplier/verifier wallets; the Evidence Lab is a separate zero-spend sandbox. |
