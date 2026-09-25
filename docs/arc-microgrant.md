@@ -145,7 +145,7 @@ as the 480 × 480 PNG logo.
 | Field | Copy |
 | --- | --- |
 | BUIDL name | Gap402 |
-| Vision | AI agents can identify a missing citation but lack a way to commission, reward, and carry forward verifiable evidence. Gap402 turns an unsupported claim into a USDC-funded bounty on Arc: suppliers submit sources, a verifier evaluates them, a deterministic settlement splits the escrow, and a portable Evidence Receipt records the result. The public Arc mainnet run demonstrates funding, payout, refund, and receipt anchoring; its semantic scorer is a labelled mock and its supplier/verifier wallets are operator-controlled. |
+| Vision | Gap402 turns unsupported AI claims into USDC-funded evidence bounties on Arc. Suppliers submit sources; settlement pays contributors and anchors a portable receipt. The mainnet demo uses a mock scorer and operator-controlled wallets. |
 | Category | Choose the closest available AI or infrastructure category. |
 | GitHub | https://github.com/tang-vu/gap402 |
 | Project website | https://gap402.tangvu.dev/mainnet |
